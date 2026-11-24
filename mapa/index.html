@@ -16,6 +16,8 @@
   --b3:#22744a; --b3-s:#d8efe1;
   --b4:#a43a2d; --b4-s:#fbe0db;
   --b5:#9a3a78; --b5-s:#f7dcef;
+  --b6:#0f6e7a; --b6-s:#d4eef0;
+  --imp:#1f6fb2; --imp-s:#e1eefa;
   --gr:#835c00; --gr-s:#fbf0cb;
   --cn:#a0501a; --cn-s:#fde3cf;
   --display:"Fraunces",Georgia,serif;
@@ -51,7 +53,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .nav .go button[data-k="b1"]{background:var(--b1-s)} .nav .go button[data-k="b2"]{background:var(--b2-s)}
 .nav .go button[data-k="b3"]{background:var(--b3-s)} .nav .go button[data-k="b4"]{background:var(--b4-s)}
 .nav .go button[data-k="b5"]{background:var(--b5-s)} .nav .go button[data-k="gr"]{background:var(--gr-s)}
-.nav .go button[data-k="cn"]{background:var(--cn-s)}
+.nav .go button[data-k="cn"]{background:var(--cn-s)} .nav .go button[data-k="b6"]{background:var(--b6-s)}
 .nav .go button[data-k="w"]{background:var(--ink);color:var(--surface);font-weight:700}
 .zoom{display:flex;gap:4px}
 .zoom .btn{width:40px;padding:0;font-size:1.2rem;font-weight:700}
@@ -75,9 +77,9 @@ ul,ol{margin:0;padding:0;list-style:none}
 .sec .kick{margin-bottom:2px}
 .sec h2{font-size:52px;font-weight:700;letter-spacing:-.01em}
 .k1 .sec .kick,.k1 h2{color:var(--b1)} .k2 .sec .kick,.k2 h2{color:var(--b2)} .k3 .sec .kick,.k3 h2{color:var(--b3)}
-.k4 .sec .kick,.k4 h2{color:var(--b4)} .k5 .sec .kick,.k5 h2{color:var(--b5)}
+.k4 .sec .kick,.k4 h2{color:var(--b4)} .k5 .sec .kick,.k5 h2{color:var(--b5)} .k6 .sec .kick,.k6 h2{color:var(--b6)}
 .k1{border-top:8px solid var(--b1)} .k2{border-top:8px solid var(--b2)} .k3{border-top:8px solid var(--b3)}
-.k4{border-top:8px solid var(--b4)} .k5{border-top:8px solid var(--b5)}
+.k4{border-top:8px solid var(--b4)} .k5{border-top:8px solid var(--b5)} .k6{border-top:8px solid var(--b6)}
 .gr{background:var(--gr-s);border-color:transparent}
 .cn{background:var(--cn-s);border-color:transparent}
 
@@ -85,7 +87,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .ls{display:grid;gap:2px}
 .ls .ph{position:relative;padding:6px 10px 6px 30px;border-radius:10px;font-weight:600;font-size:23px;line-height:1.35;cursor:pointer}
 .ls .ph::before{content:"";position:absolute;left:10px;top:.72em;width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.55}
-.k1 .ls .ph{color:var(--b1)} .k2 .ls .ph{color:var(--b2)} .k3 .ls .ph{color:var(--b3)} .k4 .ls .ph{color:var(--b4)} .k5 .ls .ph{color:var(--b5)}
+.k1 .ls .ph{color:var(--b1)} .k2 .ls .ph{color:var(--b2)} .k3 .ls .ph{color:var(--b3)} .k4 .ls .ph{color:var(--b4)} .k5 .ls .ph{color:var(--b5)} .k6 .ls .ph{color:var(--b6)}
 .ph:hover{background:color-mix(in srgb,currentColor 8%,transparent)}
 .ph.flash{background:color-mix(in srgb,var(--b3) 22%,transparent)}
 .ls .ph i{font-style:normal;font-weight:400;color:var(--muted);font-size:18px}
@@ -104,7 +106,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .formula{font-family:var(--display);font-size:26px;font-weight:700;line-height:1.3}
 
 /* tense colours */
-.tp{color:var(--pre);font-weight:700} .tf{color:var(--per);font-weight:700} .ti{color:var(--ind);font-weight:700}
+.tm2{color:var(--imp);font-weight:700} .tp{color:var(--pre);font-weight:700} .tf{color:var(--per);font-weight:700} .ti{color:var(--ind);font-weight:700}
 .end{font-weight:800}
 .tp .end,.end.tp{color:var(--pre)}
 
@@ -116,7 +118,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .cj tr:last-child td,.cj tr:last-child th{border-bottom:0}
 .cj td{font-weight:600}
 .cj .e{color:var(--pre);font-weight:800}
-.cj.per .e{color:var(--per)} .cj.ind .e{color:var(--ind)}
+.cj.per .e{color:var(--per)} .cj.ind .e{color:var(--ind)} .cj.imp .e{color:var(--imp)}
 .cj thead th.big{font:700 24px/1.1 var(--display);text-transform:none;letter-spacing:0;color:var(--ink)}
 
 /* stem-changing verbs: the boot */
@@ -133,7 +135,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .boot .chip i{font-size:15px}
 
 /* time markers */
-.tm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.tm{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .tm > div{border-radius:14px;padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--surface)}
 .tm .h{font:700 22px/1.1 var(--display)}
 .tm .chip{font-size:18px;padding:3px 12px}
@@ -153,6 +155,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .w2 .n{background:var(--b2)} .w2 h3{color:var(--b2)} .w2{background:color-mix(in srgb,var(--b2-s) 55%,var(--surface))}
 .w3 .n{background:var(--b3)} .w3 h3{color:var(--b3)} .w3{background:color-mix(in srgb,var(--b3-s) 55%,var(--surface))}
 .w4 .n{background:var(--b4)} .w4 h3{color:var(--b4)} .w4{background:color-mix(in srgb,var(--b4-s) 55%,var(--surface))}
+.w6 .n{background:var(--b6)} .w6 h3{color:var(--b6)} .w6{background:color-mix(in srgb,var(--b6-s) 55%,var(--surface))}
 .w5 .n{background:var(--b5)} .w5 h3{color:var(--b5)} .w5{background:color-mix(in srgb,var(--b5-s) 55%,var(--surface))}
 .wt{width:100%;min-height:260px;font:22px/1.75 var(--body);color:var(--ink);border:0;border-radius:12px;padding:12px 18px;resize:none;overflow:hidden;
   background:repeating-linear-gradient(to bottom,transparent 0 calc(1.75em - 1px),var(--line) calc(1.75em - 1px) 1.75em) var(--surface);
@@ -272,6 +275,13 @@ ul,ol{margin:0;padding:0;list-style:none}
 .supf .sa{background:var(--b4);color:#fff} .supf .sm{background:var(--b4);color:#fff}
 .supf .sn,.supf .sj,.supf .sd{background:var(--b4-s);color:var(--b4)}
 
+.fv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fv > div{border-radius:14px;padding:10px 14px;display:grid;gap:4px;font-size:18px;line-height:1.35}
+.fv .f1{background:var(--imp-s)} .fv .f2{background:var(--ind-s)}
+.fv b{font:700 22px/1.1 var(--display)}
+.ap{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.ap .ph{display:flex;gap:8px;align-items:baseline;padding:4px 8px;border-radius:8px;cursor:pointer;font-size:20px}
+.ap .ph b{color:var(--imp)} .ap .ph span{color:var(--muted)} .ap .ph em{font-style:normal;color:var(--pre);font-weight:700}
 /* toast + help */
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-10px);z-index:40;background:var(--ink);color:var(--surface);
   padding:8px 16px;border-radius:999px;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -454,13 +464,69 @@ ul,ol{margin:0;padding:0;list-style:none}
       </ul>
       <p class="warn">⚠︎ <b>me he</b> enamorado · <s>he me enamorado</s></p>
     </div>
+
+    <div class="card gr" id="k-imp">
+      <h3><span class="tm2">Pretérito imperfecto</span> <small>antes · la foto</small></h3>
+      <div class="fv">
+        <div class="f1"><b class="tm2">Imperfecto = la foto 📷</b>cómo era · qué había · qué hacía siempre</div>
+        <div class="f2"><b class="ti">Indefinido = el vídeo 🎬</b>qué pasó una vez</div>
+      </div>
+      <table class="cj imp">
+        <thead><tr><th></th><th class="big">-ar</th><th class="big">-er / -ir</th></tr></thead>
+        <tbody>
+          <tr><th>yo</th><td>habl<span class="e">aba</span></td><td>com<span class="e">ía</span></td></tr>
+          <tr><th>tú</th><td>habl<span class="e">abas</span></td><td>com<span class="e">ías</span></td></tr>
+          <tr><th>él, ella</th><td>habl<span class="e">aba</span></td><td>com<span class="e">ía</span></td></tr>
+          <tr><th>nosotros</th><td>habl<span class="e">ábamos</span></td><td>com<span class="e">íamos</span></td></tr>
+          <tr><th>vosotros</th><td>habl<span class="e">abais</span></td><td>com<span class="e">íais</span></td></tr>
+          <tr><th>ellos, ellas</th><td>habl<span class="e">aban</span></td><td>com<span class="e">ían</span></td></tr>
+        </tbody>
+      </table>
+      <span class="lab">solo 3 irregulares</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="era "><b>era</b><i>ser</i></span>
+        <span class="chip ph" data-ins="iba "><b>iba</b><i>ir</i></span>
+        <span class="chip ph" data-ins="veía "><b>veía</b><i>ver</i></span>
+      </div>
+      <span class="lab">para describir</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="había "><b>había</b><i>hay</i></span>
+        <span class="chip ph" data-ins="hacía calor "><b>hacía calor</b></span>
+        <span class="chip ph" data-ins="estaba "><b>estaba</b></span>
+        <span class="chip ph" data-ins="tenía "><b>tenía</b></span>
+      </div>
+      <p class="warn">⚠︎ Antes <b class="tm2">iba</b> a yoga los lunes (siempre) · Ayer <b class="ti">fui</b> a yoga (una vez)</p>
+    </div>
+
+    <div class="card k6" id="k-antes">
+      <div class="sec"><span class="kick">Bloque 6 · imperfecto + presente</span><h2>Antes y ahora</h2></div>
+      <ul class="ls">
+        <li class="ph" data-ins="Antes vivía en Estambul, pero ahora vivo en Madrid. ">Antes vivía en…, pero ahora vivo en…</li>
+        <li class="ph" data-ins="Cuando era pequeña, ">Cuando era pequeña, …</li>
+        <li class="ph" data-ins="En Estambul siempre ">En Estambul siempre…</li>
+        <li class="ph" data-ins="Los domingos desayunábamos en ">Los domingos desayunábamos en…</li>
+        <li class="ph" data-ins="Mi casa en Estambul era ">Mi casa en Estambul era…</li>
+        <li class="ph" data-ins="Antes no me gustaba ">Antes no me gustaba…, ahora…</li>
+      </ul>
+      <span class="lab">antes → ahora</span>
+      <div class="ap">
+        <span class="ph" data-ins="vivía "><b>vivía</b><span>→</span><em>vivo</em></span>
+        <span class="ph" data-ins="trabajaba "><b>trabajaba</b><span>→</span><em>trabajo</em></span>
+        <span class="ph" data-ins="iba "><b>iba</b><span>→</span><em>voy</em></span>
+        <span class="ph" data-ins="tenía "><b>tenía</b><span>→</span><em>tengo</em></span>
+        <span class="ph" data-ins="hablaba turco "><b>hablaba turco</b><span>→</span><em>hablo español</em></span>
+        <span class="ph" data-ins="salía "><b>salía</b><span>→</span><em>salgo</em></span>
+        <span class="ph" data-ins="comía "><b>comía</b><span>→</span><em>como</em></span>
+        <span class="ph" data-ins="era "><b>era</b><span>→</span><em>es</em></span>
+      </div>
+    </div>
   </div>
 
   <!-- ================= CENTRE · writing page ================= -->
   <div class="col" id="c-mid">
     <div class="card" id="k-write">
       <h2>Mis textos</h2>
-      <p>Cinco textos pequeños. Toca un bloque y después una frase del mapa: aparece en ese bloque.</p>
+      <p>Seis textos pequeños. Toca un bloque y después una frase del mapa: aparece en ese bloque.</p>
 
       <div class="wblk w1 on" data-b="1">
         <div class="wblk-h"><h3><span class="n">1</span>Mi semana <small>6–8 frases · presente y pasado</small></h3>
@@ -497,6 +563,13 @@ ul,ol{margin:0;padding:0;list-style:none}
         <span class="bc"></span>
       </div>
 
+      <div class="wblk w6" data-b="6">
+        <div class="wblk-h"><h3><span class="n">6</span>Antes y ahora <small>4–5 frases · imperfecto + presente</small></h3>
+          <div class="qs"><span>¿Dónde vivías antes?</span><span>¿Qué hacías los domingos en Estambul?</span><span>¿Qué es diferente ahora?</span></div></div>
+        <textarea class="wt" id="d6" lang="es" spellcheck="false" placeholder="Antes vivía en Estambul… Ahora…"></textarea>
+        <span class="bc"></span>
+      </div>
+
       <div class="wbar"><span class="wc" id="wc">0 palabras</span><span class="target">frases cortas: <b>sujeto + verbo + algo</b></span><span style="flex:1"></span>
         <button class="btn" id="undoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="copyBtn" type="button">Copiar</button></div>
     </div>
@@ -510,6 +583,8 @@ ul,ol{margin:0;padding:0;list-style:none}
           <div class="chips"><span class="chip ph" data-ins="Hoy ">hoy</span><span class="chip ph" data-ins="esta mañana ">esta mañana</span><span class="chip ph" data-ins="esta semana ">esta semana</span><span class="chip ph" data-ins="alguna vez ">alguna vez</span><span class="chip ph" data-ins="nunca ">nunca</span></div></div>
         <div><span class="h ti">Indefinido</span>
           <div class="chips"><span class="chip ph" data-ins="Ayer ">ayer</span><span class="chip ph" data-ins="anoche ">anoche</span><span class="chip ph" data-ins="el lunes ">el lunes</span><span class="chip ph" data-ins="la semana pasada ">la semana pasada</span><span class="chip ph" data-ins="el sábado ">el sábado</span></div></div>
+        <div><span class="h tm2">Imperfecto</span>
+          <div class="chips"><span class="chip ph" data-ins="Antes ">antes</span><span class="chip ph" data-ins="Cuando era pequeña, ">cuando era pequeña</span><span class="chip ph" data-ins="todos los veranos ">todos los veranos</span><span class="chip ph" data-ins="siempre ">siempre (antes)</span></div></div>
       </div>
     </div>
 
@@ -620,6 +695,7 @@ ul,ol{margin:0;padding:0;list-style:none}
       <h3>Antes de terminar</h3>
       <ul class="checks">
         <li><span class="tp">normalmente</span> → presente · <span class="tf">hoy, esta semana</span> → perfecto · <span class="ti">ayer, el lunes</span> → indefinido</li>
+        <li><span class="tm2">antes, cuando era pequeña</span> → imperfecto</li>
         <li>La vocal: qu<span class="v">ie</span>ro, p<span class="v">ue</span>do, p<span class="v">i</span>do, j<span class="v">ue</span>go</li>
         <li><b>hay</b> un parque · el Retiro <b>está</b>…</li>
         <li>me <b>gusta</b> + una cosa · me <b>gustan</b> + cosas</li>
@@ -712,11 +788,13 @@ ul,ol{margin:0;padding:0;list-style:none}
     <button type="button" data-go="k-irr" data-k="gr">e→ie · o→ue</button>
     <button type="button" data-go="k-perf" data-k="gr">Perfecto</button>
     <button type="button" data-go="k-indef" data-k="gr">Indefinido</button>
+    <button type="button" data-go="k-imp" data-k="gr">Imperfecto</button>
     <button type="button" data-go="k-sem" data-k="b1">1 · Mi semana</button>
     <button type="button" data-go="k-exp" data-k="b2">2 · ¿Alguna vez?</button>
     <button type="button" data-go="k-hay" data-k="b3">3 · Hay</button>
     <button type="button" data-go="k-sup" data-k="b4">4 · Lo más</button>
     <button type="button" data-go="gusta" data-k="b5">5 · Me gusta</button>
+    <button type="button" data-go="k-antes" data-k="b6">6 · Antes y ahora</button>
     <button type="button" data-go="k-cn" data-k="cn">Conectores</button>
     <button type="button" data-go="k-google" data-k="b4">Ask Google</button>
   </div>
