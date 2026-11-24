@@ -1,0 +1,930 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mi semana en Madrid · mapa de escritura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* Deniz's design (same as cuaderno-1): Fraunces + Figtree, cream paper, tense colours
+   presente green · perfecto violet · indefinido terracotta.
+   One pastel per writing block: 1 semana = blue, 2 experiencias = violet, 3 hay = mint, 4 lo más = rose,
+   5 gustar = magenta; grammar = butter, connectors = peach. */
+:root{
+  --board:#efe9de; --dots:#d9d0c1; --surface:#ffffff; --paper:#FBF7F0; --ink:#1D2433; --muted:#5E6678; --line:#E2DDD3;
+  --pre:#1E7B67; --pre-s:#E3F2EE; --per:#6A4BB5; --per-s:#EEE9F8; --ind:#C2502E; --ind-s:#FAEAE3;
+  --b1:#2b5a9e; --b1-s:#dce8fa;
+  --b2:#6A4BB5; --b2-s:#EEE9F8;
+  --b3:#22744a; --b3-s:#d8efe1;
+  --b4:#a43a2d; --b4-s:#fbe0db;
+  --b5:#9a3a78; --b5-s:#f7dcef;
+  --gr:#835c00; --gr-s:#fbf0cb;
+  --cn:#a0501a; --cn-s:#fde3cf;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Figtree","Segoe UI",system-ui,sans-serif;
+}
+/* Always light: brighter for studying, whatever the device setting. */
+:root{color-scheme:light}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;margin:0}
+body{background:var(--board);color:var(--ink);font-family:var(--body);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.12;margin:0;text-wrap:balance}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+
+/* ---------- bars ---------- */
+.top{position:fixed;left:0;right:0;top:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 8px;
+  display:flex;gap:10px;align-items:center;background:color-mix(in srgb,var(--board) 96%,transparent);
+  border-bottom:1px solid var(--line)}
+.top .who{color:var(--muted);font-size:.9rem;white-space:nowrap;font-weight:600;text-decoration:none}
+.top .ttl{font-family:var(--display);font-weight:700;font-size:1.1rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;min-height:40px}
+.btn.main{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible{outline:2px solid var(--b1);outline-offset:2px}
+.nav{position:fixed;left:0;bottom:0;z-index:20;right:0;padding:8px 12px calc(env(safe-area-inset-bottom,0px) + 8px);
+  display:flex;gap:8px;align-items:center;background:color-mix(in srgb,var(--board) 96%,transparent);
+  border-top:1px solid var(--line)}
+.nav .go{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.nav .go::-webkit-scrollbar{display:none}
+.nav .go button{font:inherit;font-size:.9rem;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;color:var(--ink);background:var(--surface);min-height:40px}
+.nav .go button[data-k="b1"]{background:var(--b1-s)} .nav .go button[data-k="b2"]{background:var(--b2-s)}
+.nav .go button[data-k="b3"]{background:var(--b3-s)} .nav .go button[data-k="b4"]{background:var(--b4-s)}
+.nav .go button[data-k="b5"]{background:var(--b5-s)} .nav .go button[data-k="gr"]{background:var(--gr-s)}
+.nav .go button[data-k="cn"]{background:var(--cn-s)}
+.nav .go button[data-k="w"]{background:var(--ink);color:var(--surface);font-weight:700}
+.zoom{display:flex;gap:4px}
+.zoom .btn{width:40px;padding:0;font-size:1.2rem;font-weight:700}
+@media (max-width:520px){.top .ttl,.top .who{visibility:hidden}}
+
+/* ---------- board ---------- */
+#view{position:fixed;inset:0;overflow:hidden;touch-action:none;cursor:grab;
+  background-color:var(--board);background-image:radial-gradient(var(--dots) 1.4px,transparent 1.6px);background-size:28px 28px}
+#view.grabbing{cursor:grabbing}
+#board{position:absolute;left:0;top:0;transform-origin:0 0;display:grid;padding:80px;
+  grid-template-columns:740px 1040px 740px;gap:90px 110px;align-items:start;font-size:21px;line-height:1.5}
+#board.moving{will-change:transform}
+.col{display:grid;gap:40px;align-content:start}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px 28px;display:grid;gap:14px;align-content:start;
+  box-shadow:0 1px 0 rgba(0,0,0,.03),0 8px 24px -14px rgba(29,36,51,.25);cursor:zoom-in}
+.card > h3{font-size:32px;font-weight:700;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.card > h3 small{font:400 18px/1.3 var(--body);color:var(--muted)}
+.kick{font:700 15px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sec{display:grid;gap:4px}
+.sec .kick{margin-bottom:2px}
+.sec h2{font-size:52px;font-weight:700;letter-spacing:-.01em}
+.k1 .sec .kick,.k1 h2{color:var(--b1)} .k2 .sec .kick,.k2 h2{color:var(--b2)} .k3 .sec .kick,.k3 h2{color:var(--b3)}
+.k4 .sec .kick,.k4 h2{color:var(--b4)} .k5 .sec .kick,.k5 h2{color:var(--b5)}
+.k1{border-top:8px solid var(--b1)} .k2{border-top:8px solid var(--b2)} .k3{border-top:8px solid var(--b3)}
+.k4{border-top:8px solid var(--b4)} .k5{border-top:8px solid var(--b5)}
+.gr{background:var(--gr-s);border-color:transparent}
+.cn{background:var(--cn-s);border-color:transparent}
+
+/* plain tappable list */
+.ls{display:grid;gap:2px}
+.ls .ph{position:relative;padding:6px 10px 6px 30px;border-radius:10px;font-weight:600;font-size:23px;line-height:1.35;cursor:pointer}
+.ls .ph::before{content:"";position:absolute;left:10px;top:.72em;width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.55}
+.k1 .ls .ph{color:var(--b1)} .k2 .ls .ph{color:var(--b2)} .k3 .ls .ph{color:var(--b3)} .k4 .ls .ph{color:var(--b4)} .k5 .ls .ph{color:var(--b5)}
+.ph:hover{background:color-mix(in srgb,currentColor 8%,transparent)}
+.ph.flash{background:color-mix(in srgb,var(--b3) 22%,transparent)}
+.ls .ph i{font-style:normal;font-weight:400;color:var(--muted);font-size:18px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--surface);border-radius:999px;padding:5px 14px;font-size:19px;cursor:pointer;border:1px solid var(--line)}
+.gr .chip,.cn .chip{border-color:transparent}
+.chip b{font-weight:700}
+.chip i{font-style:normal;color:var(--muted);font-size:16px;margin-left:4px}
+.cn .chip b{color:var(--cn)}
+.lab{font:700 14px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.note{font-size:18px;color:var(--muted)}
+.warn{font-size:18px}
+.warn s{color:var(--muted)}
+.formula{font-family:var(--display);font-size:26px;font-weight:700;line-height:1.3}
+
+/* tense colours */
+.tp{color:var(--pre);font-weight:700} .tf{color:var(--per);font-weight:700} .ti{color:var(--ind);font-weight:700}
+.end{font-weight:800}
+.tp .end,.end.tp{color:var(--pre)}
+
+/* conjugation tables */
+.cj{border-collapse:collapse;width:100%;font-size:20px;line-height:1.3}
+.cj th,.cj td{text-align:left;padding:7px 10px;border-bottom:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+.cj thead th{font:700 15px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cj tbody th{font-weight:600;color:var(--muted);white-space:nowrap;font-size:18px}
+.cj tr:last-child td,.cj tr:last-child th{border-bottom:0}
+.cj td{font-weight:600}
+.cj .e{color:var(--pre);font-weight:800}
+.cj.per .e{color:var(--per)} .cj.ind .e{color:var(--ind)}
+.cj thead th.big{font:700 24px/1.1 var(--display);text-transform:none;letter-spacing:0;color:var(--ink)}
+
+/* stem-changing verbs: the boot */
+.boots{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.boot{background:var(--surface);border-radius:16px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.boot h4{font:700 28px/1 var(--display);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;white-space:nowrap}
+.boot h4 small{font:600 17px/1 var(--body);color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.boot ol{display:grid;gap:0;font-size:20px;font-weight:600}
+.boot ol li{padding:2px 8px;border-radius:6px}
+.boot ol li.in{background:var(--pre-s)}
+.boot ol li.out{color:var(--muted);font-weight:400}
+.v{color:#d23a1e;background:#ffe3a8;border-radius:4px;padding:0;font-weight:800;font-style:normal}
+.boot .chip{font-size:18px;padding:4px 12px;background:var(--paper)}
+.boot .chip i{font-size:15px}
+
+/* time markers */
+.tm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.tm > div{border-radius:14px;padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--surface)}
+.tm .h{font:700 22px/1.1 var(--display)}
+.tm .chip{font-size:18px;padding:3px 12px}
+
+/* ---------- writing page (centre) ---------- */
+#k-write{cursor:auto;padding:34px 40px;gap:18px;border:2px solid var(--ink);box-shadow:0 20px 60px -30px rgba(29,36,51,.5);background:var(--paper)}
+#k-write > h2{font-size:52px;font-weight:700}
+.wblk{border-radius:18px;padding:16px 18px 18px;display:grid;gap:10px;border:3px solid transparent;background:var(--surface)}
+.wblk.on{border-color:var(--ink)}
+.wblk-h{display:grid;gap:4px;cursor:pointer}
+.wblk-h h3{font:700 32px/1.1 var(--display);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.wblk-h h3 .n{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;color:#fff;font:700 24px/1 var(--display);flex:none;align-self:center}
+.wblk-h h3 small{font:400 18px/1.3 var(--body);color:var(--muted)}
+.wblk .qs{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:19px;color:var(--muted)}
+.wblk .qs span::before{content:"› ";font-weight:700}
+.w1 .n{background:var(--b1)} .w1 h3{color:var(--b1)} .w1{background:color-mix(in srgb,var(--b1-s) 55%,var(--surface))}
+.w2 .n{background:var(--b2)} .w2 h3{color:var(--b2)} .w2{background:color-mix(in srgb,var(--b2-s) 55%,var(--surface))}
+.w3 .n{background:var(--b3)} .w3 h3{color:var(--b3)} .w3{background:color-mix(in srgb,var(--b3-s) 55%,var(--surface))}
+.w4 .n{background:var(--b4)} .w4 h3{color:var(--b4)} .w4{background:color-mix(in srgb,var(--b4-s) 55%,var(--surface))}
+.w5 .n{background:var(--b5)} .w5 h3{color:var(--b5)} .w5{background:color-mix(in srgb,var(--b5-s) 55%,var(--surface))}
+.wt{width:100%;min-height:260px;font:22px/1.75 var(--body);color:var(--ink);border:0;border-radius:12px;padding:12px 18px;resize:none;overflow:hidden;
+  background:repeating-linear-gradient(to bottom,transparent 0 calc(1.75em - 1px),var(--line) calc(1.75em - 1px) 1.75em) var(--surface);
+  background-attachment:local;background-position:0 12px}
+.wt:focus-visible{outline:3px solid var(--b1);outline-offset:2px}
+.bc{font-size:16px;color:var(--muted);justify-self:end;font-variant-numeric:tabular-nums}
+.wbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wc{font-variant-numeric:tabular-nums;font-weight:700;padding:6px 14px;border-radius:999px;font-size:19px;background:var(--board)}
+.target{font-size:18px;color:var(--muted)}
+.target b{color:var(--ink)}
+#k-write .btn{font-size:18px}
+
+/* ---------- bands (top and bottom) ---------- */
+#info{grid-column:1/-1;display:grid;grid-template-columns:.95fr 1.75fr 1fr 1fr;gap:40px;align-items:start}
+#gusta{grid-column:1/-1;display:grid;grid-template-columns:.9fr 1.9fr .95fr;gap:40px;align-items:start}
+.band-h{grid-column:1/-1;display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}
+.band-h h2{font-size:64px;font-weight:700;letter-spacing:-.01em}
+.band-h p{font-size:24px;color:var(--muted)}
+
+/* photos */
+.pics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pic.wide{grid-column:1/-1}
+.pics.four{grid-template-columns:repeat(4,1fr)}
+.pic{margin:0;border-radius:14px;overflow:hidden;background:var(--paper);cursor:pointer;display:grid;align-content:start;border:1px solid var(--line)}
+.pic img{display:block;width:100%;height:190px;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+.pic figcaption{padding:8px 12px 10px;font-size:19px;line-height:1.3;font-weight:600}
+.pic figcaption i{display:block;font-style:normal;font-weight:400;font-size:16px;color:var(--muted);margin-top:2px}
+.pic .g{display:inline-block;font:700 14px/1 var(--body);padding:4px 8px;border-radius:999px;background:var(--b5-s);color:var(--b5);margin-left:6px;vertical-align:2px}
+.pic .g.pl{background:var(--b5);color:#fff}
+.k4 .pic figcaption{color:var(--b4)}
+.ask .ph{display:block;padding:8px 12px;border-radius:12px;background:var(--b4-s);color:var(--b4);font-weight:600;font-size:20px;cursor:pointer}
+.ask{display:grid;gap:8px}
+.scale{display:grid;gap:4px;font-size:20px}
+.scale div{display:flex;gap:10px;align-items:center}
+.scale span:first-child{width:76px;text-align:center;flex:none}
+.gtab td:nth-child(2){color:var(--b5);font-weight:800}
+.credits{font-size:14px;color:var(--muted);line-height:1.45}
+
+/* model + skeleton */
+.para{padding:12px 16px;border-radius:12px;border-left:6px solid var(--b1);background:var(--b1-s);font-size:20px;line-height:1.7}
+.mt{font-family:var(--display);font-size:28px;font-weight:700}
+.c{color:var(--cn);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.mkey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:16px;color:var(--muted)}
+.mold .ph{padding:6px 10px;border-radius:10px;font-size:19px;cursor:pointer}
+.mold .ph u{text-decoration:none;color:var(--muted)}
+.mold h4{font:700 14px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;margin-top:6px}
+.checks{display:grid;gap:4px}
+.checks li{position:relative;padding-left:32px;font-size:19px}
+.checks li::before{content:"☐";position:absolute;left:0;top:-3px;font-size:23px;color:var(--b2)}
+
+
+/* stem-change verb lists */
+.vl{display:grid;gap:2px}
+.vl li{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:5px 8px;border-radius:8px;cursor:pointer;font-size:20px}
+.vl li:nth-child(odd){background:var(--paper)}
+.vl li b{font-weight:700}
+.vl li i{font-style:normal;color:var(--muted);font-size:18px;white-space:nowrap}
+
+/* daily routine tiles */
+.rts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.rt{display:grid;justify-items:center;text-align:center;gap:2px;padding:10px 4px 8px;border-radius:14px;background:var(--b1-s);cursor:pointer}
+.rt .em{font-size:40px;line-height:1.1}
+.rt b{font-size:19px;line-height:1.2;color:var(--b1)}
+.rt i{font-style:normal;font-size:15px;color:var(--muted);line-height:1.2}
+
+/* yo nunca */
+.ynbox{background:#f6c915;border-radius:18px;padding:16px;display:grid;gap:12px}
+.ynh{display:flex;gap:12px;align-items:baseline}
+.ynh b{font:800 34px/1 var(--display);letter-spacing:.02em;color:#1d1d1d}
+.ynh span{font-size:17px;color:#3a3000;font-style:italic}
+.yns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yn{background:#fff;border-radius:10px;padding:10px 12px;font-size:19px;font-weight:600;line-height:1.3;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+
+/* superlative articles + the forms we never use */
+.arts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.arts div{background:var(--b4-s);border-radius:14px;padding:12px 14px;font:600 26px/1.2 var(--display);text-align:center}
+.arts b{color:var(--b4)}
+.nono{display:grid;gap:8px}
+.nono div{display:grid;grid-template-columns:1.15fr 34px .9fr 1fr;align-items:center;gap:8px;background:var(--paper);border-radius:14px;padding:10px 14px}
+.nono s{font:600 26px/1.1 var(--display);color:var(--muted);text-decoration-color:var(--b4);text-decoration-thickness:3px}
+.nono small{font-size:15px;color:var(--muted)}
+.nono .ar2{font:700 28px/1 var(--display);color:var(--b4);text-align:center}
+.nono b{font:700 34px/1.1 var(--display);color:var(--b4);cursor:pointer;border-radius:8px}
+.nono i{font-style:normal;font-size:17px;color:var(--muted)}
+
+/* Ask Google (a simple mock search box) */
+.gg{display:grid;gap:14px;justify-items:center;padding:18px 8px 8px}
+.glogo{font:500 64px/1 "Product Sans","Figtree",Arial,sans-serif;letter-spacing:-2px}
+.glogo span:nth-child(1),.glogo span:nth-child(4){color:#4285f4} .glogo span:nth-child(2),.glogo span:nth-child(6){color:#ea4335}
+.glogo span:nth-child(3){color:#fbbc05} .glogo span:nth-child(5){color:#34a853}
+.gbar{width:100%;display:flex;align-items:center;gap:12px;border:1px solid #dfe1e5;border-radius:999px;padding:12px 22px;background:#fff;
+  box-shadow:0 1px 6px rgba(32,33,36,.18);font-family:Arial,var(--body);font-size:21px;min-height:58px}
+.gbar #gq{color:#202124}
+.gbar #gq.ph0{color:#9aa0a6}
+#gcur{display:inline-block;width:2px;height:24px;background:#202124;margin-left:-10px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.gres{width:100%;border:1px solid #dadce0;border-radius:14px;padding:14px 18px;display:grid;gap:4px;font-family:Arial,var(--body);background:#fff}
+.gsrc{font-size:15px;color:#4d5156}
+.gres b{font-size:30px;color:#1a0dab;font-weight:400}
+.gres p{font-size:18px;color:#4d5156}
+.gtodo{font-size:19px;font-weight:700;color:var(--b4)}
+.gqs{display:flex;flex-wrap:wrap;gap:8px}
+.gq{font:inherit;font-size:18px;border:1px solid #dadce0;background:#fff;border-radius:999px;padding:7px 14px;cursor:pointer;color:#3c4043;text-align:left}
+.gq::before{content:"🔍 ";font-size:15px}
+.gq.on{background:#e8f0fe;border-color:#4285f4;color:#174ea6}
+@media (prefers-reduced-motion: reduce){#gcur{animation:none}}
+
+/* family prompts (say it in Spanish) */
+.pic.fam{cursor:default;background:var(--b5-s);border-color:transparent}
+.pic.fam .famh{font-size:34px;text-align:center;padding:44px 4px 30px;white-space:nowrap}
+.pic.fam figcaption i{color:var(--b5);font-weight:700}
+
+
+.supf{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font:700 22px/1.15 var(--display);text-align:center}
+.supf > span:not(.pl){border-radius:12px;padding:8px 10px;white-space:nowrap}
+.supf .pl{color:var(--muted)}
+.supf .sa{background:var(--b4);color:#fff} .supf .sm{background:var(--b4);color:#fff}
+.supf .sn,.supf .sj,.supf .sd{background:var(--b4-s);color:var(--b4)}
+
+/* toast + help */
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-10px);z-index:40;background:var(--ink);color:var(--surface);
+  padding:8px 16px;border-radius:999px;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.help{position:fixed;z-index:25;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;padding:12px 16px;display:flex;gap:12px;align-items:center;font-size:.95rem;box-shadow:0 10px 30px -16px rgba(0,0,0,.4);width:min(640px,calc(100vw - 32px))}
+.help p{flex:1;line-height:1.4}
+.two{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .25s;
+  background:color-mix(in srgb,var(--ink) 38%,transparent)}
+.two.on{opacity:1}
+.two p{background:var(--surface);color:var(--ink);border-radius:18px;padding:16px 22px;font:700 1.15rem/1.3 var(--body);display:flex;gap:12px;align-items:center;
+  box-shadow:0 12px 40px -16px rgba(0,0,0,.5);max-width:calc(100vw - 32px)}
+.two p span{font-size:1.8rem}
+@media (prefers-reduced-motion: reduce){.toast,.two{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="who" href="../">← Deniz · Español</a>
+  <span class="ttl">Mi semana en Madrid · mapa de escritura</span>
+  <button class="btn main" data-go="k-write" type="button">✍︎ Mis textos</button>
+</div>
+
+<div id="view" aria-label="Mapa: arrastra para moverte, pellizca para hacer zoom">
+<div id="board">
+
+  <!-- ================= TOP BAND · the verbs ================= -->
+  <div id="info">
+    <div class="band-h"><h2>Los verbos</h2><p><span class="tp">presente</span> · <span class="tf">pretérito perfecto</span> · <span class="ti">pretérito indefinido</span></p></div>
+
+    <div class="card gr" id="k-pres">
+      <h3>Presente <small>regular</small></h3>
+      <table class="cj">
+        <thead><tr><th></th><th class="big">habl<span class="end tp">ar</span></th><th class="big">com<span class="end tp">er</span></th><th class="big">viv<span class="end tp">ir</span></th></tr></thead>
+        <tbody>
+          <tr><th>yo</th><td>habl<span class="e">o</span></td><td>com<span class="e">o</span></td><td>viv<span class="e">o</span></td></tr>
+          <tr><th>tú</th><td>habl<span class="e">as</span></td><td>com<span class="e">es</span></td><td>viv<span class="e">es</span></td></tr>
+          <tr><th>él, ella, usted</th><td>habl<span class="e">a</span></td><td>com<span class="e">e</span></td><td>viv<span class="e">e</span></td></tr>
+          <tr><th>nosotros/as</th><td>habl<span class="e">amos</span></td><td>com<span class="e">emos</span></td><td>viv<span class="e">imos</span></td></tr>
+          <tr><th>vosotros/as</th><td>habl<span class="e">áis</span></td><td>com<span class="e">éis</span></td><td>viv<span class="e">ís</span></td></tr>
+          <tr><th>ellos, ellas, ustedes</th><td>habl<span class="e">an</span></td><td>com<span class="e">en</span></td><td>viv<span class="e">en</span></td></tr>
+        </tbody>
+      </table>
+      <span class="lab">yo irregular</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="soy "><b>soy</b><i>ser</i></span>
+        <span class="chip ph" data-ins="estoy "><b>estoy</b><i>estar</i></span>
+        <span class="chip ph" data-ins="voy "><b>voy</b><i>ir</i></span>
+        <span class="chip ph" data-ins="hago "><b>hago</b><i>hacer</i></span>
+        <span class="chip ph" data-ins="salgo "><b>salgo</b><i>salir</i></span>
+        <span class="chip ph" data-ins="tengo "><b>tengo</b><i>tener</i></span>
+        <span class="chip ph" data-ins="conozco "><b>conozco</b><i>conocer</i></span>
+        <span class="chip ph" data-ins="sé "><b>sé</b><i>saber</i></span>
+      </div>
+    </div>
+
+    <div class="card gr" id="k-irr">
+      <h3>Presente: la vocal cambia <small>los verbos más usados · nosotros y vosotros no cambian</small></h3>
+      <div class="boots">
+<div class="boot"><h4>e → <span class="v">ie</span></h4><ul class="vl"><li class="ph" data-ins="quiero "><b>querer</b><i>qu<span class="v">ie</span>ro</i></li><li class="ph" data-ins="empiezo "><b>empezar</b><i>emp<span class="v">ie</span>zo</i></li><li class="ph" data-ins="pienso "><b>pensar</b><i>p<span class="v">ie</span>nso</i></li><li class="ph" data-ins="prefiero "><b>preferir</b><i>pref<span class="v">ie</span>ro</i></li><li class="ph" data-ins="entiendo "><b>entender</b><i>ent<span class="v">ie</span>ndo</i></li><li class="ph" data-ins="cierro "><b>cerrar</b><i>c<span class="v">ie</span>rro</i></li><li class="ph" data-ins="me despierto "><b>despertarse</b><i>me desp<span class="v">ie</span>rto</i></li><li class="ph" data-ins="me siento "><b>sentarse</b><i>me s<span class="v">ie</span>nto</i></li><li class="ph" data-ins="pierdo "><b>perder</b><i>p<span class="v">ie</span>rdo</i></li><li class="ph" data-ins="tengo · tienes "><b>tener</b><i>tengo · t<span class="v">ie</span>nes</i></li><li class="ph" data-ins="vengo · vienes "><b>venir</b><i>vengo · v<span class="v">ie</span>nes</i></li></ul></div>
+<div class="boot"><h4>o → <span class="v">ue</span></h4><ul class="vl"><li class="ph" data-ins="puedo "><b>poder</b><i>p<span class="v">ue</span>do</i></li><li class="ph" data-ins="vuelvo "><b>volver</b><i>v<span class="v">ue</span>lvo</i></li><li class="ph" data-ins="duermo "><b>dormir</b><i>d<span class="v">ue</span>rmo</i></li><li class="ph" data-ins="me acuesto "><b>acostarse</b><i>me ac<span class="v">ue</span>sto</i></li><li class="ph" data-ins="encuentro "><b>encontrar</b><i>enc<span class="v">ue</span>ntro</i></li><li class="ph" data-ins="recuerdo "><b>recordar</b><i>rec<span class="v">ue</span>rdo</i></li><li class="ph" data-ins="cuento "><b>contar</b><i>c<span class="v">ue</span>nto</i></li><li class="ph" data-ins="cuesta "><b>costar</b><i>c<span class="v">ue</span>sta</i></li><li class="ph" data-ins="sueño "><b>soñar</b><i>s<span class="v">ue</span>ño</i></li><li class="ph" data-ins="llueve "><b>llover</b><i>ll<span class="v">ue</span>ve</i></li></ul></div>
+<div class="boot"><h4>e → <span class="v">i</span></h4><ul class="vl"><li class="ph" data-ins="pido "><b>pedir</b><i>p<span class="v">i</span>do</i></li><li class="ph" data-ins="me visto "><b>vestirse</b><i>me v<span class="v">i</span>sto</i></li><li class="ph" data-ins="repito "><b>repetir</b><i>rep<span class="v">i</span>to</i></li><li class="ph" data-ins="sigo "><b>seguir</b><i>s<span class="v">i</span>go</i></li><li class="ph" data-ins="sirvo "><b>servir</b><i>s<span class="v">i</span>rvo</i></li><li class="ph" data-ins="elijo "><b>elegir</b><i>el<span class="v">i</span>jo</i></li><li class="ph" data-ins="digo · dices "><b>decir</b><i>digo · d<span class="v">i</span>ces</i></li></ul><p class="note">Solo verbos en <b>-ir</b>.</p></div>
+<div class="boot"><h4>u → <span class="v">ue</span></h4><ul class="vl"><li class="ph" data-ins="juego "><b>jugar</b><i>j<span class="v">ue</span>go</i></li></ul><p class="note">Solo un verbo.</p></div>
+      </div>
+      <p class="warn">⚠︎ <s>yo quero</s> → yo qu<span class="v">ie</span>ro · <s>nosotros puedemos</s> → nosotros podemos</p>
+    </div>
+
+    <div class="card gr" id="k-perf">
+      <h3><span class="tf">Pretérito perfecto</span></h3>
+      <p class="formula"><span class="tf">haber</span> + <span class="tf">-ado / -ido</span></p>
+      <table class="cj per">
+        <tbody>
+          <tr><th>yo</th><td><span class="e">he</span></td><td rowspan="6" style="vertical-align:middle;color:var(--per)">habl<b>ado</b><br>com<b>ido</b><br>viv<b>ido</b></td></tr>
+          <tr><th>tú</th><td><span class="e">has</span></td></tr>
+          <tr><th>él, ella</th><td><span class="e">ha</span></td></tr>
+          <tr><th>nosotros</th><td><span class="e">hemos</span></td></tr>
+          <tr><th>vosotros</th><td><span class="e">habéis</span></td></tr>
+          <tr><th>ellos, ellas</th><td><span class="e">han</span></td></tr>
+        </tbody>
+      </table>
+      <span class="lab">irregulares</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="he hecho "><b>hecho</b><i>hacer</i></span>
+        <span class="chip ph" data-ins="he visto "><b>visto</b><i>ver</i></span>
+        <span class="chip ph" data-ins="he dicho "><b>dicho</b><i>decir</i></span>
+        <span class="chip ph" data-ins="he escrito "><b>escrito</b><i>escribir</i></span>
+        <span class="chip ph" data-ins="he vuelto "><b>vuelto</b><i>volver</i></span>
+        <span class="chip ph" data-ins="he puesto "><b>puesto</b><i>poner</i></span>
+        <span class="chip ph" data-ins="he abierto "><b>abierto</b><i>abrir</i></span>
+      </div>
+      <p class="note">hoy · esta semana · alguna vez · nunca</p>
+    </div>
+
+    <div class="card gr" id="k-indef">
+      <h3><span class="ti">Pretérito indefinido</span></h3>
+      <table class="cj ind">
+        <thead><tr><th></th><th class="big">-ar</th><th class="big">-er / -ir</th></tr></thead>
+        <tbody>
+          <tr><th>yo</th><td>habl<span class="e">é</span></td><td>com<span class="e">í</span></td></tr>
+          <tr><th>tú</th><td>habl<span class="e">aste</span></td><td>com<span class="e">iste</span></td></tr>
+          <tr><th>él, ella</th><td>habl<span class="e">ó</span></td><td>com<span class="e">ió</span></td></tr>
+          <tr><th>nosotros</th><td>habl<span class="e">amos</span></td><td>com<span class="e">imos</span></td></tr>
+          <tr><th>vosotros</th><td>habl<span class="e">asteis</span></td><td>com<span class="e">isteis</span></td></tr>
+          <tr><th>ellos, ellas</th><td>habl<span class="e">aron</span></td><td>com<span class="e">ieron</span></td></tr>
+        </tbody>
+      </table>
+      <span class="lab">irregulares · yo</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="fui "><b>fui</b><i>ir / ser</i></span>
+        <span class="chip ph" data-ins="hice "><b>hice</b><i>hacer</i></span>
+        <span class="chip ph" data-ins="tuve "><b>tuve</b><i>tener</i></span>
+        <span class="chip ph" data-ins="estuve "><b>estuve</b><i>estar</i></span>
+        <span class="chip ph" data-ins="pude "><b>pude</b><i>poder</i></span>
+        <span class="chip ph" data-ins="vi "><b>vi</b><i>ver</i></span>
+        <span class="chip ph" data-ins="fue "><b>fue</b><i>él, ella: ir / ser</i></span>
+      </div>
+      <p class="note">ayer · el lunes · la semana pasada · en 2024</p>
+    </div>
+  </div>
+
+  <!-- ================= LEFT ================= -->
+  <div class="col" id="c-left">
+    <div class="card k1" id="k-sem">
+      <div class="sec"><span class="kick">Bloque 1 · presente + pasado</span><h2>Mi semana</h2></div>
+      <span class="lab" style="color:var(--pre)">normalmente…</span>
+      <ul class="ls">
+        <li class="ph" data-ins="Normalmente me levanto a las ">Normalmente me levanto a las…</li>
+        <li class="ph" data-ins="Todos los días voy a ">Todos los días voy a…</li>
+      </ul>
+      <span class="lab" style="color:var(--per)">esta semana / hoy…</span>
+      <ul class="ls">
+        <li class="ph" data-ins="Esta semana ha sido ">Esta semana ha sido…</li>
+        <li class="ph" data-ins="Hoy he ">Hoy he…</li>
+      </ul>
+      <span class="lab" style="color:var(--ind)">el lunes / ayer…</span>
+      <ul class="ls">
+        <li class="ph" data-ins="El lunes fui a ">El lunes fui a…</li>
+        <li class="ph" data-ins="Ayer comí ">Ayer comí…</li>
+        <li class="ph" data-ins="El fin de semana salí con ">El fin de semana salí con…</li>
+        <li class="ph" data-ins="Fue muy ">Fue muy… <i>→ adjetivo</i></li>
+      </ul>
+    </div>
+
+    <div class="card k1" id="k-rut">
+      <h3>Mi día <small>la rutina diaria</small></h3>
+      <div class="rts"><div class="rt ph" data-ins="despertarse "><span class="em">⏰</span><b>despertarse</b></div><div class="rt ph" data-ins="levantarse "><span class="em">🛏️</span><b>levantarse</b></div><div class="rt ph" data-ins="ir al baño "><span class="em">🚽</span><b>ir al baño</b></div><div class="rt ph" data-ins="ducharse "><span class="em">🚿</span><b>ducharse</b></div><div class="rt ph" data-ins="vestirse "><span class="em">👗</span><b>vestirse</b></div><div class="rt ph" data-ins="lavarse los dientes "><span class="em">🪥</span><b>lavarse los dientes</b></div><div class="rt ph" data-ins="desayunar "><span class="em">🥐</span><b>desayunar</b></div><div class="rt ph" data-ins="salir de casa "><span class="em">🚪</span><b>salir de casa</b></div><div class="rt ph" data-ins="coger el metro "><span class="em">🚇</span><b>coger el metro</b></div><div class="rt ph" data-ins="coger el autobús "><span class="em">🚌</span><b>coger el autobús</b></div><div class="rt ph" data-ins="coger un taxi "><span class="em">🚕</span><b>coger un taxi</b></div><div class="rt ph" data-ins="conducir "><span class="em">🚗</span><b>conducir</b></div><div class="rt ph" data-ins="ir a clase "><span class="em">🎓</span><b>ir a clase</b></div><div class="rt ph" data-ins="estudiar "><span class="em">💻</span><b>estudiar</b></div><div class="rt ph" data-ins="trabajar "><span class="em">👩‍💼</span><b>trabajar</b></div><div class="rt ph" data-ins="tomar un café "><span class="em">☕</span><b>tomar un café</b></div><div class="rt ph" data-ins="comer "><span class="em">🍽️</span><b>comer</b></div><div class="rt ph" data-ins="volver a casa "><span class="em">🏠</span><b>volver a casa</b></div><div class="rt ph" data-ins="cocinar "><span class="em">🍳</span><b>cocinar</b></div><div class="rt ph" data-ins="cenar "><span class="em">🥗</span><b>cenar</b></div><div class="rt ph" data-ins="ver series "><span class="em">📺</span><b>ver series</b></div><div class="rt ph" data-ins="mirar TikTok "><span class="em">📱</span><b>mirar TikTok</b></div><div class="rt ph" data-ins="leer "><span class="em">📖</span><b>leer</b></div><div class="rt ph" data-ins="ir al supermercado "><span class="em">🛒</span><b>ir al supermercado</b></div><div class="rt ph" data-ins="ir de compras "><span class="em">🛍️</span><b>ir de compras</b></div><div class="rt ph" data-ins="lavar la ropa "><span class="em">🧺</span><b>lavar la ropa</b></div><div class="rt ph" data-ins="hacer yoga "><span class="em">🧘‍♀️</span><b>hacer yoga</b></div><div class="rt ph" data-ins="correr "><span class="em">🏃‍♀️</span><b>correr</b></div><div class="rt ph" data-ins="ir al gimnasio "><span class="em">🏋️</span><b>ir al gimnasio</b></div><div class="rt ph" data-ins="andar en bici "><span class="em">🚲</span><b>andar en bici</b></div><div class="rt ph" data-ins="salir de copas "><span class="em">🍸</span><b>salir de copas</b></div><div class="rt ph" data-ins="salir a bailar "><span class="em">💃</span><b>salir a bailar</b></div><div class="rt ph" data-ins="bañarse "><span class="em">🛁</span><b>bañarse</b></div><div class="rt ph" data-ins="acostarse "><span class="em">🌙</span><b>acostarse</b></div><div class="rt ph" data-ins="dormir "><span class="em">😴</span><b>dormir</b></div></div>
+      <span class="lab">¿Qué comes?</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="una tortilla de patatas ">una tortilla</span>
+        <span class="chip ph" data-ins="una ensalada ">una ensalada</span>
+        <span class="chip ph" data-ins="pasta ">pasta</span>
+        <span class="chip ph" data-ins="pescado ">pescado</span>
+        <span class="chip ph" data-ins="unas tapas ">unas tapas</span>
+        <span class="chip ph" data-ins="el menú del día ">el menú del día</span>
+        <span class="chip ph" data-ins="un café con leche ">un café con leche</span>
+        <span class="chip ph" data-ins="una copa de vino ">una copa de vino</span>
+      </div>
+      <span class="lab">¿Cómo es?</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="rico ">rico</span><span class="chip ph" data-ins="caro ">caro</span><span class="chip ph" data-ins="barato ">barato</span>
+        <span class="chip ph" data-ins="divertido ">divertido</span><span class="chip ph" data-ins="aburrido ">aburrido</span><span class="chip ph" data-ins="interesante ">interesante</span>
+        <span class="chip ph" data-ins="bonito ">bonito</span><span class="chip ph" data-ins="tranquilo ">tranquilo</span><span class="chip ph" data-ins="cansada ">cansada</span><span class="chip ph" data-ins="contenta ">contenta</span>
+      </div>
+    </div>
+
+    <div class="card k2" id="k-exp">
+      <div class="sec"><span class="kick">Bloque 2 · pretérito perfecto</span><h2>¿Alguna vez…?</h2></div>
+      <div class="ynbox"><div class="ynh"><b>YO NUNCA</b><span>never have I ever</span></div>
+        <div class="yns"><span class="yn ph" data-ins="¿Te has enamorado alguna vez? ">¿Te has enamorado alguna vez?</span><span class="yn ph" data-ins="¿Has besado a alguien en la primera cita? ">¿Has besado a alguien en la primera cita?</span><span class="yn ph" data-ins="¿Has tenido una cita por una app? ">¿Has tenido una cita por una app?</span><span class="yn ph" data-ins="¿Has mirado el Instagram de tu ex? ">¿Has mirado el Instagram de tu ex?</span><span class="yn ph" data-ins="¿Has enviado un mensaje a la persona equivocada? ">¿Has enviado un mensaje a la persona equivocada?</span><span class="yn ph" data-ins="¿Has olvidado el nombre de alguien en una cita? ">¿Has olvidado el nombre de alguien en una cita?</span><span class="yn ph" data-ins="¿Has llorado con una película? ">¿Has llorado con una película?</span><span class="yn ph" data-ins="¿Has mentido a tu madre? ">¿Has mentido a tu madre?</span><span class="yn ph" data-ins="¿Has bailado encima de una mesa? ">¿Has bailado encima de una mesa?</span><span class="yn ph" data-ins="¿Has dormido en un aeropuerto? ">¿Has dormido en un aeropuerto?</span><span class="yn ph" data-ins="¿Has cantado en la ducha? ">¿Has cantado en la ducha?</span><span class="yn ph" data-ins="¿Has hecho un vídeo para TikTok? ">¿Has hecho un vídeo para TikTok?</span></div></div>
+      <span class="lab">responde</span>
+      <ul class="ls">
+        <li class="ph" data-ins="Sí, una vez. ">Sí, una vez.</li>
+        <li class="ph" data-ins="Sí, muchas veces. ">Sí, muchas veces. 🙈</li>
+        <li class="ph" data-ins="No, nunca. ">No, nunca.</li>
+        <li class="ph" data-ins="¡Nunca jamás! ">¡Nunca jamás!</li>
+        <li class="ph" data-ins="Yo nunca he ">Yo nunca he…</li>
+        <li class="ph" data-ins="He estado en Barcelona dos veces. ">He estado en… dos veces.</li>
+        <li class="ph" data-ins="¿Y tú? ">¿Y tú?</li>
+      </ul>
+      <p class="warn">⚠︎ <b>me he</b> enamorado · <s>he me enamorado</s></p>
+    </div>
+  </div>
+
+  <!-- ================= CENTRE · writing page ================= -->
+  <div class="col" id="c-mid">
+    <div class="card" id="k-write">
+      <h2>Mis textos</h2>
+      <p>Cinco textos pequeños. Toca un bloque y después una frase del mapa: aparece en ese bloque.</p>
+
+      <div class="wblk w1 on" data-b="1">
+        <div class="wblk-h"><h3><span class="n">1</span>Mi semana <small>6–8 frases · presente y pasado</small></h3>
+          <div class="qs"><span>¿Qué haces normalmente?</span><span>¿Qué hiciste el lunes?</span><span>¿Qué comiste?</span><span>¿Cómo fue?</span></div></div>
+        <textarea class="wt" id="draft" lang="es" spellcheck="false" placeholder="Normalmente me levanto a las… Esta semana…"></textarea>
+        <span class="bc"></span>
+      </div>
+
+      <div class="wblk w2" data-b="2">
+        <div class="wblk-h"><h3><span class="n">2</span>¿Alguna vez…? <small>4–5 frases · pretérito perfecto</small></h3>
+          <div class="qs"><span>¿Dónde has estado?</span><span>¿Qué no has hecho nunca?</span><span>¿Y tu amiga?</span></div></div>
+        <textarea class="wt" id="d2" lang="es" spellcheck="false" placeholder="He estado en… Nunca he…"></textarea>
+        <span class="bc"></span>
+      </div>
+
+      <div class="wblk w3" data-b="3">
+        <div class="wblk-h"><h3><span class="n">3</span>Mi barrio <small>4–5 frases · hay / no hay / está</small></h3>
+          <div class="qs"><span>¿Qué hay en Goya?</span><span>¿Qué no hay?</span><span>¿Dónde está el Retiro?</span></div></div>
+        <textarea class="wt" id="d3" lang="es" spellcheck="false" placeholder="En mi barrio hay… No hay…"></textarea>
+        <span class="bc"></span>
+      </div>
+
+      <div class="wblk w4" data-b="4">
+        <div class="wblk-h"><h3><span class="n">4</span>Estambul y Madrid: lo más… <small>4–5 frases · superlativo</small></h3>
+          <div class="qs"><span>¿Cuál es el barrio más bonito?</span><span>¿Y el mejor restaurante?</span><span>Busca en Google y escribe</span></div></div>
+        <textarea class="wt" id="d4" lang="es" spellcheck="false" placeholder="Para mí, el mejor restaurante de Estambul es…"></textarea>
+        <span class="bc"></span>
+      </div>
+
+      <div class="wblk w5" data-b="5">
+        <div class="wblk-h"><h3><span class="n">5</span>Me gusta, no me gusta <small>5–6 frases · gustar</small></h3>
+          <div class="qs"><span>¿Qué te gusta de Madrid?</span><span>¿Qué no te gusta nada?</span><span>¿Y a tu padre? ¿Y a tu madre?</span></div></div>
+        <textarea class="wt" id="d5" lang="es" spellcheck="false" placeholder="Me encanta… No me gustan…"></textarea>
+        <span class="bc"></span>
+      </div>
+
+      <div class="wbar"><span class="wc" id="wc">0 palabras</span><span class="target">frases cortas: <b>sujeto + verbo + algo</b></span><span style="flex:1"></span>
+        <button class="btn" id="undoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="copyBtn" type="button">Copiar</button></div>
+    </div>
+
+    <div class="card gr" id="k-time">
+      <h3>¿Qué tiempo uso? <small>la palabra clave decide</small></h3>
+      <div class="tm">
+        <div><span class="h tp">Presente</span>
+          <div class="chips"><span class="chip ph" data-ins="Normalmente ">normalmente</span><span class="chip ph" data-ins="todos los días ">todos los días</span><span class="chip ph" data-ins="siempre ">siempre</span><span class="chip ph" data-ins="los lunes ">los lunes</span></div></div>
+        <div><span class="h tf">Perfecto</span>
+          <div class="chips"><span class="chip ph" data-ins="Hoy ">hoy</span><span class="chip ph" data-ins="esta mañana ">esta mañana</span><span class="chip ph" data-ins="esta semana ">esta semana</span><span class="chip ph" data-ins="alguna vez ">alguna vez</span><span class="chip ph" data-ins="nunca ">nunca</span></div></div>
+        <div><span class="h ti">Indefinido</span>
+          <div class="chips"><span class="chip ph" data-ins="Ayer ">ayer</span><span class="chip ph" data-ins="anoche ">anoche</span><span class="chip ph" data-ins="el lunes ">el lunes</span><span class="chip ph" data-ins="la semana pasada ">la semana pasada</span><span class="chip ph" data-ins="el sábado ">el sábado</span></div></div>
+      </div>
+    </div>
+
+    <div class="card cn" id="k-cn">
+      <h3>Conectores <small>usa 4 o más</small></h3>
+      <div class="chips">
+        <span class="chip ph" data-ins="y "><b>y</b><i>and</i></span>
+        <span class="chip ph" data-ins="pero "><b>pero</b><i>but</i></span>
+        <span class="chip ph" data-ins="también "><b>también</b><i>also</i></span>
+        <span class="chip ph" data-ins="porque "><b>porque</b><i>because</i></span>
+        <span class="chip ph" data-ins="Por eso, "><b>por eso</b><i>so</i></span>
+        <span class="chip ph" data-ins="Primero, "><b>primero</b><i>first</i></span>
+        <span class="chip ph" data-ins="Después, "><b>después</b><i>after that</i></span>
+        <span class="chip ph" data-ins="Luego, "><b>luego</b><i>then</i></span>
+        <span class="chip ph" data-ins="Al final, "><b>al final</b><i>in the end</i></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT ================= -->
+  <div class="col" id="c-right">
+    <div class="card k3" id="k-hay">
+      <div class="sec"><span class="kick">Bloque 3 · hay / no hay</span><h2>Mi barrio</h2></div>
+      <p class="formula"><span style="color:var(--b3)">hay</span> + un / una / dos / muchos + cosa</p>
+      <ul class="ls">
+        <li class="ph" data-ins="Vivo en Goya, en el barrio de Salamanca. ">Vivo en Goya, en el barrio de Salamanca.</li>
+        <li class="ph" data-ins="En mi barrio hay ">En mi barrio hay…</li>
+        <li class="ph" data-ins="Cerca de mi casa hay ">Cerca de mi casa hay…</li>
+        <li class="ph" data-ins="En Madrid no hay ">En Madrid no hay…</li>
+        <li class="ph" data-ins="En Estambul hay mar, pero en Madrid no hay mar. ">En Estambul hay…, pero en Madrid no hay…</li>
+        <li class="ph" data-ins="El Retiro está cerca de mi casa. ">El Retiro está cerca de mi casa.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip ph" data-ins="un supermercado ">un supermercado</span>
+        <span class="chip ph" data-ins="una farmacia ">una farmacia</span>
+        <span class="chip ph" data-ins="un gimnasio ">un gimnasio</span>
+        <span class="chip ph" data-ins="una estación de metro ">una estación de metro</span>
+        <span class="chip ph" data-ins="un parque ">un parque</span>
+        <span class="chip ph" data-ins="muchas tiendas ">muchas tiendas</span>
+        <span class="chip ph" data-ins="muchos restaurantes ">muchos restaurantes</span>
+        <span class="chip ph" data-ins="muchos bares ">muchos bares</span>
+        <span class="chip ph" data-ins="mucho tráfico ">mucho tráfico</span>
+        <span class="chip ph" data-ins="mucha gente ">mucha gente</span>
+        <span class="chip ph" data-ins="mar ">mar</span>
+        <span class="chip ph" data-ins="playa ">playa</span>
+      </div>
+      <p class="warn">⚠︎ <s>hay el Retiro</s> → <b>el Retiro está</b> en Madrid · <b>no hay</b> playa (sin un / una)</p>
+    </div>
+
+    <div class="card k4" id="k-sup">
+      <div class="sec"><span class="kick">Bloque 4 · superlativo</span><h2>Lo más…</h2></div>
+      <div class="supf">
+        <span class="sa">el · la<br>los · las</span><span class="pl">+</span><span class="sn">cosa</span><span class="pl">+</span><span class="sm">más<br>menos</span><span class="pl">+</span><span class="sj">adjetivo</span><span class="pl">+</span><span class="sd">de + lugar</span>
+      </div>
+      <div class="arts">
+        <div><b>el</b> barrio <b>más</b> caro</div><div><b>la</b> calle <b>más</b> bonita</div>
+        <div><b>los</b> restaurantes <b>más</b> caros</div><div><b>las</b> tiendas <b>más</b> caras</div>
+      </div>
+      <p class="note" style="text-align:center">+ <b>de</b> Madrid / de Estambul / del mundo</p>
+      <div class="nono">
+        <div><span class="x"><s>el más bueno</s></span><span class="ar2">→</span><b class="ph" data-ins="el mejor ">el mejor</b><i>los mejores</i></div>
+        <div><span class="x"><s>el más malo</s></span><span class="ar2">→</span><b class="ph" data-ins="el peor ">el peor</b><i>los peores</i></div>
+        <div><span class="x"><s>el más peor</s></span><span class="ar2">→</span><b class="ph" data-ins="el peor ">el peor</b><i></i></div>
+        <div><span class="x"><s>el más grande</s> <small>(edad)</small></span><span class="ar2">→</span><b class="ph" data-ins="el mayor ">el mayor</b><i>mi hermana mayor</i></div>
+        <div><span class="x"><s>el más pequeño</s> <small>(edad)</small></span><span class="ar2">→</span><b class="ph" data-ins="el menor ">el menor</b><i>soy la menor</i></div>
+      </div>
+      <ul class="ls">
+        <li class="ph" data-ins="Para mí, el mejor restaurante de Estambul es Neolokal. ">Para mí, el mejor restaurante de Estambul es…</li>
+        <li class="ph" data-ins="El barrio más bonito de Madrid es ">El barrio más bonito de Madrid es…</li>
+        <li class="ph" data-ins="Las tiendas más caras de Madrid están en ">Las tiendas más caras de Madrid están en…</li>
+      </ul>
+    </div>
+
+    <div class="card k4" id="k-fotos">
+      <h3>Lo más… <small>toca la foto</small></h3>
+      <div class="pics">
+        <figure class="pic ph" data-ins="El Everest es la montaña más alta del mundo. "><img src="img/everest.jpg" alt="El monte Everest"><figcaption>la montaña más alta del mundo<i>el Everest · 8.849 m</i></figcaption></figure>
+        <figure class="pic ph" data-ins="Estambul es la ciudad más grande de Turquía. "><img src="img/bosforo.jpg" alt="Estambul desde el Bósforo"><figcaption>la ciudad más grande de Turquía<i>Estambul · casi 16 millones</i></figcaption></figure>
+        <figure class="pic ph" data-ins="Santa Sofía es el monumento más famoso de Estambul. "><img src="img/santa-sofia.jpg" alt="Santa Sofía, Estambul"><figcaption>el monumento más famoso de Estambul<i>Santa Sofía</i></figcaption></figure>
+        <figure class="pic ph" data-ins="El Prado es el museo más famoso de Madrid. "><img src="img/prado.jpg" alt="Museo del Prado, Madrid"><figcaption>el museo más famoso de Madrid<i>el Prado</i></figcaption></figure>
+        <figure class="pic ph" data-ins="La Torre de Cristal es el edificio más alto de España. "><img src="img/torre-cristal.jpg" alt="Torre de Cristal, Madrid"><figcaption>el edificio más alto de España<i>la Torre de Cristal · 249 m</i></figcaption></figure>
+        <figure class="pic ph" data-ins="El Retiro es el parque más famoso de Madrid, pero no es el más grande. "><img src="img/retiro.jpg" alt="El lago del Retiro"><figcaption>el parque más famoso de Madrid<i>el Retiro · el más grande es la Casa de Campo</i></figcaption></figure>
+      </div>
+    </div>
+
+    <div class="card k4" id="k-google">
+      <h3>Ask Google <small>read the answer → write it in Spanish, your way</small></h3>
+      <div class="gg">
+        <div class="glogo" aria-hidden="true"><span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span></div>
+        <div class="gbar"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#5f6368" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="#5f6368" stroke-width="2.2" stroke-linecap="round"/></svg><span id="gq">Tap a question below…</span><i id="gcur"></i></div>
+        <div class="gres" id="gres" hidden><span class="gsrc" id="gsrc"></span><b id="ga"></b><p id="gd"></p></div>
+        <p class="gtodo" id="gtodo" hidden>✍︎ Now write it in Spanish in block 4.</p>
+      </div>
+      <div class="gqs">
+        <button type="button" class="gq" data-q="the oldest restaurant in the world" data-a="Sobrino de Botín" data-d="Madrid · open since 1725 · Guinness World Records">the oldest restaurant in the world</button>
+        <button type="button" class="gq" data-q="the richest person in Spain" data-a="Amancio Ortega" data-d="The founder of Zara (Inditex), from Galicia.">the richest person in Spain</button>
+        <button type="button" class="gq" data-q="the most famous Spanish fashion brand" data-a="Zara" data-d="Founded in A Coruña in 1975 · shops in almost 100 countries">the most famous Spanish fashion brand</button>
+        <button type="button" class="gq" data-q="the most followed person on Instagram" data-a="Cristiano Ronaldo" data-d="More than 600 million followers · ex Real Madrid">the most followed person on Instagram</button>
+        <button type="button" class="gq" data-q="the most expensive shopping street in Madrid" data-a="Calle de Serrano" data-d="Barrio de Salamanca · Loewe, Chanel, Dior…">the most expensive shopping street in Madrid</button>
+        <button type="button" class="gq" data-q="the most expensive neighbourhood in Madrid" data-a="Barrio de Salamanca" data-d="Your neighbourhood! Goya, Serrano, Velázquez…">the most expensive neighbourhood in Madrid</button>
+        <button type="button" class="gq" data-q="the most famous Turkish pop singer" data-a="Tarkan" data-d="“The Prince of Pop” · Şımarık (1997)">the most famous Turkish pop singer</button>
+        <button type="button" class="gq" data-q="the most famous Turkish dessert" data-a="Baklava" data-d="The best one is from Gaziantep, they say.">the most famous Turkish dessert</button>
+        <button type="button" class="gq" data-q="the most followed account on TikTok" data-a="Search it on your phone 📱" data-d="The answer changes every month!">the most followed account on TikTok</button>
+      </div>
+    </div>
+
+    <div class="card" id="k-check">
+      <h3>Antes de terminar</h3>
+      <ul class="checks">
+        <li><span class="tp">normalmente</span> → presente · <span class="tf">hoy, esta semana</span> → perfecto · <span class="ti">ayer, el lunes</span> → indefinido</li>
+        <li>La vocal: qu<span class="v">ie</span>ro, p<span class="v">ue</span>do, p<span class="v">i</span>do, j<span class="v">ue</span>go</li>
+        <li><b>hay</b> un parque · el Retiro <b>está</b>…</li>
+        <li>me <b>gusta</b> + una cosa · me <b>gustan</b> + cosas</li>
+        <li>Tildes: comí, salí, me acosté · <b>fui</b>, <b>fue</b> sin tilde</li>
+        <li>4 conectores distintos</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM BAND · likes ================= -->
+  <div id="gusta">
+    <div class="band-h"><h2 style="color:var(--b5)">Me gusta, no me gusta</h2><p>Bloque 5 · para hablar con tus amigas</p></div>
+
+    <div class="card k5" id="k-gus">
+      <div class="sec"><span class="kick">Bloque 5 · gustar</span><h2>¿Te gusta?</h2></div>
+      <table class="cj gtab">
+        <tbody>
+          <tr><th>(a mí)</th><td>me</td><td rowspan="6" style="vertical-align:middle"><b>gusta</b> + una cosa / verbo<br><b>gustan</b> + cosas</td></tr>
+          <tr><th>(a ti)</th><td>te</td></tr>
+          <tr><th>(a él, a ella, a mi padre)</th><td>le</td></tr>
+          <tr><th>(a nosotros)</th><td>nos</td></tr>
+          <tr><th>(a vosotros)</th><td>os</td></tr>
+          <tr><th>(a ellos, a mis padres)</th><td>les</td></tr>
+        </tbody>
+      </table>
+      <div class="scale">
+        <div><span>❤️❤️</span><span class="ph" data-ins="Me encanta ">me encanta(n)</span></div>
+        <div><span>❤️</span><span class="ph" data-ins="Me gusta mucho ">me gusta(n) mucho</span></div>
+        <div><span>🙂</span><span class="ph" data-ins="Me gusta ">me gusta(n)</span></div>
+        <div><span>😐</span><span class="ph" data-ins="No me gusta mucho ">no me gusta(n) mucho</span></div>
+        <div><span>✗✗</span><span class="ph" data-ins="No me gusta nada ">no me gusta(n) nada</span></div>
+      </div>
+      <ul class="ls">
+        <li class="ph" data-ins="A mi padre le gusta ">A mi padre le gusta…</li>
+        <li class="ph" data-ins="A mi madre no le gustan ">A mi madre no le gustan…</li>
+        <li class="ph" data-ins="A mí también. ">A mí también. <i>🙂 + 🙂</i></li>
+        <li class="ph" data-ins="A mí tampoco. ">A mí tampoco. <i>✗ + ✗</i></li>
+        <li class="ph" data-ins="A mí sí. ">A mí sí. · A mí no.</li>
+      </ul>
+      <p class="warn">⚠︎ <s>yo gusto el té</s> → <b>me gusta</b> el té · <s>me gusta los gatos</s> → me <b>gustan</b> los gatos</p>
+    </div>
+
+    <div class="card k5" id="k-gfotos">
+      <h3>¿Te gusta o no te gusta? <small>toca la foto · <span class="pic" style="display:inline;border:0;background:none"><span class="g">gusta</span><span class="g pl">gustan</span></span></small></h3>
+      <div class="pics four">
+        <figure class="pic ph" data-ins="el flamenco "><img src="img/flamenco.jpg" alt="Una bailaora de flamenco"><figcaption>el flamenco<span class="g">gusta</span></figcaption></figure>
+        <figure class="pic ph" data-ins="las corridas de toros "><img src="img/toros.jpg" alt="Una corrida de toros en Madrid"><figcaption>las corridas de toros<span class="g pl">gustan</span><i>¿cultura o crueldad?</i></figcaption></figure>
+        <figure class="pic ph" data-ins="la tortilla de patatas "><img src="img/tortilla.jpg" alt="Tortilla de patatas"><figcaption>la tortilla de patatas<span class="g">gusta</span><i>¿con cebolla o sin cebolla?</i></figcaption></figure>
+        <figure class="pic ph" data-ins="el arte clásico "><img src="img/meninas.jpg" alt="Las Meninas, de Velázquez"><figcaption>el arte clásico<span class="g">gusta</span><i>Las Meninas · el Prado</i></figcaption></figure>
+        <figure class="pic ph" data-ins="el té turco "><img src="img/te.jpg" alt="Un vaso de té turco"><figcaption>el té turco<span class="g">gusta</span></figcaption></figure>
+        <figure class="pic ph" data-ins="los gatos de Estambul "><img src="img/gato.jpg" alt="Un gato en Estambul"><figcaption>los gatos de Estambul<span class="g pl">gustan</span></figcaption></figure>
+        <figure class="pic ph" data-ins="el simit "><img src="img/simit.jpg" alt="Un simit"><figcaption>el simit<span class="g">gusta</span></figcaption></figure>
+        <figure class="pic ph" data-ins="el fútbol "><img src="img/bernabeu.jpg" alt="El estadio Santiago Bernabéu"><figcaption>el fútbol<span class="g">gusta</span><i>¿Real Madrid o Atleti?</i></figcaption></figure>
+        <figure class="pic ph" data-ins="los conciertos "><img src="img/concierto.jpg" alt="Gente en un concierto"><figcaption>los conciertos<span class="g pl">gustan</span></figcaption></figure>
+        <figure class="pic fam"><figcaption class="famh">👨 + ❤️❤️ + ⚽</figcaption><figcaption>Your dad loves football.<i>🗣️ Say it in Spanish</i></figcaption></figure>
+        <figure class="pic fam"><figcaption class="famh">👩 + ✗✗ + 🐂</figcaption><figcaption>Your mum doesn't like bullfighting at all.<i>🗣️ Say it in Spanish</i></figcaption></figure>
+        <figure class="pic fam"><figcaption class="famh">👨👩 + ❤️ + 🫖</figcaption><figcaption>Your parents love Turkish tea. And you?<i>🗣️ Say it in Spanish</i></figcaption></figure>
+      </div>
+    </div>
+
+    <div class="col" style="gap:40px">
+      <div class="card k5" id="k-amigas">
+        <h3>Entre amigas <small>pregunta y responde</small></h3>
+        <ul class="ls">
+          <li class="ph" data-ins="¿Te gusta vivir en Madrid? ">¿Te gusta vivir en Madrid?</li>
+          <li class="ph" data-ins="¿Qué música te gusta? ">¿Qué música te gusta?</li>
+          <li class="ph" data-ins="¿Te gusta el reguetón? ">¿Te gusta el reguetón?</li>
+          <li class="ph" data-ins="¿Te gustan las corridas de toros? ">¿Te gustan las corridas de toros?</li>
+          <li class="ph" data-ins="¿Te gusta la política? ">¿Te gusta la política?</li>
+          <li class="ph" data-ins="¿Te gusta el arte moderno? ">¿Te gusta el arte moderno?</li>
+          <li class="ph" data-ins="¿Qué te gusta más, Madrid o Estambul? ">¿Qué te gusta más, Madrid o Estambul?</li>
+          <li class="ph" data-ins="¿A tu padre le gusta el fútbol? ">¿A tu padre le gusta el fútbol?</li>
+        </ul>
+      </div>
+      <div class="card" id="k-cred">
+        <h3>Fotos <small>Wikimedia Commons</small></h3>
+        <p class="credits">Everest: Luca Galuzzi, CC BY-SA 2.5 · Estambul: SegLig, CC BY 4.0 · Santa Sofía: Arild Vågen, CC BY-SA 3.0 · Prado: Oilisab, CC BY-SA 4.0 · Torre de Cristal: Carlos Delgado, CC BY-SA 3.0 · Retiro: David Adam Kess, CC BY-SA 3.0 · Guepardo: Mark Dumont, CC BY 2.0 · Flamenco: Raymonst3, CC BY-SA 4.0 · Toros: Jan Kranendonk, CC BY-SA 4.0 · Tortilla: Mentxuwiki, CC BY-SA 4.0 · Las Meninas: Diego Velázquez, dominio público · Té: eXploration Etoile, CC0 · Gato: Jakub Hałun, CC BY 4.0 · Simit: «Simit-2x.JPG», CC BY-SA 3.0 · Bernabéu: Zoser, CC BY 4.0 · Concierto: Asaf Antman, CC BY 2.0</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="nav">
+  <div class="go" id="go">
+    <button type="button" data-go="all">Todo</button>
+    <button type="button" data-go="k-write" data-k="w">Mis textos</button>
+    <button type="button" data-go="k-pres" data-k="gr">Presente</button>
+    <button type="button" data-go="k-irr" data-k="gr">e→ie · o→ue</button>
+    <button type="button" data-go="k-perf" data-k="gr">Perfecto</button>
+    <button type="button" data-go="k-indef" data-k="gr">Indefinido</button>
+    <button type="button" data-go="k-sem" data-k="b1">1 · Mi semana</button>
+    <button type="button" data-go="k-exp" data-k="b2">2 · ¿Alguna vez?</button>
+    <button type="button" data-go="k-hay" data-k="b3">3 · Hay</button>
+    <button type="button" data-go="k-sup" data-k="b4">4 · Lo más</button>
+    <button type="button" data-go="gusta" data-k="b5">5 · Me gusta</button>
+    <button type="button" data-go="k-cn" data-k="cn">Conectores</button>
+    <button type="button" data-go="k-google" data-k="b4">Ask Google</button>
+  </div>
+  <div class="zoom"><button class="btn" id="zo" type="button" aria-label="Alejar">−</button><button class="btn" id="zi" type="button" aria-label="Acercar">+</button></div>
+</div>
+
+<div class="help" id="help"><p><b>Dos dedos</b> para mover el mapa y hacer zoom. <b>Un dedo</b> para tocar: una frase va a tu texto.</p><button class="btn" id="helpOk" type="button">Vale</button></div>
+<div class="toast" id="toast"></div>
+<div class="two" id="two" aria-hidden="true"><p><span>✌︎</span>Usa dos dedos para mover el mapa</p></div>
+
+<script>
+(function(){
+const view=document.getElementById('view'), board=document.getElementById('board');
+const MIN=0.08, MAX=2.6, P='deniz-mapa';
+let s=1, x=0, y=0, anim=null, settleT=null;
+
+function apply(){
+  board.style.transform=`translate(${x}px,${y}px) scale(${s})`;
+  board.classList.add('moving');
+  clearTimeout(settleT);
+  settleT=setTimeout(()=>board.classList.remove('moving'),180); // re-rasterise text crisply at rest
+}
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function zoomAt(f,cx,cy){ const ns=clamp(s*f,MIN,MAX); f=ns/s; x=cx-(cx-x)*f; y=cy-(cy-y)*f; s=ns; apply(); }
+function stopAnim(){ if(anim){cancelAnimationFrame(anim);anim=null;} }
+
+function insets(){
+  const t=document.querySelector('.top').getBoundingClientRect().bottom;
+  const b=document.querySelector('.nav').getBoundingClientRect().height;
+  return {t:t+16,b:b+16,l:16,r:16};
+}
+function worldRect(el){            // layout position, independent of the current zoom
+  let x0=0,y0=0,n=el;
+  while(n && n!==board){ x0+=n.offsetLeft; y0+=n.offsetTop; n=n.offsetParent; }
+  return {x:x0, y:y0, w:el.offsetWidth, h:el.offsetHeight};
+}
+function fitTarget(r,maxS,topW){
+  const vr=view.getBoundingClientRect(), i=insets(), aw=vr.width-i.l-i.r, ah=vr.height-i.t-i.b;
+  const ns=clamp(topW?Math.min(aw/r.w,maxS):Math.min(aw/r.w,ah/r.h,maxS),MIN,MAX);
+  return {s:ns, x:i.l+(aw-r.w*ns)/2-r.x*ns, y:(r.h*ns>ah ? i.t : i.t+(ah-r.h*ns)/2)-r.y*ns};
+}
+function flyTo(t,ms=650){
+  stopAnim();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) ms=0;
+  const s0=s,x0=x,y0=y,t0=performance.now(), ease=k=>1-Math.pow(1-k,3);
+  (function step(now){
+    const k=ms?Math.min(1,((now||t0)-t0)/ms):1, e=ease(k);
+    s=Math.exp(Math.log(s0)+(Math.log(t.s)-Math.log(s0))*e); x=x0+(t.x-x0)*e; y=y0+(t.y-y0)*e; apply();
+    anim=k<1?requestAnimationFrame(step):null;
+  })();
+}
+function goAll(ms){ flyTo(fitTarget({x:0,y:0,w:board.offsetWidth,h:board.offsetHeight},1),ms); }
+function goEl(id,ms){
+  if(id==='all') return goAll(ms);
+  const el=document.getElementById(id); if(!el) return;
+  const tall=id==='k-write'||id==='info';
+  flyTo(fitTarget(worldRect(el), id==='k-write'?0.85:1.2, tall), ms);
+}
+
+/* ---- gestures ----
+   Touch and pencil: one finger only taps; two fingers pan and pinch (like FigJam, tldraw or a Google Map
+   embedded in a page), so the map never moves by accident. Mouse: drag pans. Trackpad: scroll pans, pinch zooms. */
+const pts=new Map(); let last=null, moved=0, vel={x:0,y:0}, lastT=0, pinch=null, hinted=false;
+const two=document.getElementById('two'); let twoT;
+let twoSeen=false; try{ twoSeen=!!localStorage.getItem(P+'-two'); }catch(_){}
+function hintTwo(){ if(twoSeen) return; twoSeen=true; try{localStorage.setItem(P+'-two','1');}catch(_){} two.classList.add('on'); clearTimeout(twoT); twoT=setTimeout(()=>two.classList.remove('on'),1300); }
+let inField=false;
+view.addEventListener('pointerdown',e=>{
+  if(pts.size>=2) return;                                  // ignore a palm or third finger
+  const field=!!e.target.closest('textarea,button');
+  if(field && e.pointerType==='mouse') return;
+  stopAnim();
+  if(!field){ try{ view.setPointerCapture(e.pointerId); }catch(_){} }
+  if(pts.size===0) inField=field;
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
+  if(e.pointerType!=='mouse') lastTouch=performance.now();
+  if(pts.size===1){ last={x:e.clientX,y:e.clientY}; moved=0; hinted=false; vel={x:0,y:0}; lastT=performance.now(); }
+  if(pts.size===2){ const [a,b]=[...pts.values()]; pinch={d:Math.hypot(a.x-b.x,a.y-b.y),cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};
+    moved=99; hinted=true; vel={x:0,y:0}; lastT=performance.now(); two.classList.remove('on'); }
+  if(e.pointerType==='mouse') view.classList.add('grabbing');
+});
+addEventListener('pointermove',e=>{
+  const p=pts.get(e.pointerId); if(!p) return;
+  p.x=e.clientX; p.y=e.clientY;
+  const now=performance.now(), dt=Math.max(1,now-lastT);
+  if(pts.size===2 && pinch){
+    const [a,b]=[...pts.values()], d=Math.hypot(a.x-b.x,a.y-b.y), cx=(a.x+b.x)/2, cy=(a.y+b.y)/2;
+    const dx=cx-pinch.cx, dy=cy-pinch.cy;
+    x+=dx; y+=dy;
+    zoomAt(d/pinch.d,cx,cy);
+    vel={x:.8*vel.x+.2*dx/dt*16, y:.8*vel.y+.2*dy/dt*16}; lastT=now;
+    pinch={d,cx,cy};
+  } else if(pts.size===1 && last){
+    const dx=e.clientX-last.x, dy=e.clientY-last.y;
+    moved+=Math.abs(dx)+Math.abs(dy);
+    last={x:e.clientX,y:e.clientY};
+    if(p.type==='mouse'){
+      x+=dx; y+=dy; apply();
+      vel={x:.8*vel.x+.2*dx/dt*16, y:.8*vel.y+.2*dy/dt*16}; lastT=now;
+    } else if(moved>14 && !hinted && !inField){ hinted=true; hintTwo(); }
+  }
+});
+function up(e){
+  if(!pts.has(e.pointerId)) return;
+  pts.delete(e.pointerId);
+  if(pts.size===1){ pinch=null; const q=[...pts.values()][0]; last={x:q.x,y:q.y}; return; }
+  if(pts.size===0){ pinch=null; view.classList.remove('grabbing'); }
+}
+addEventListener('pointerup',up); addEventListener('pointercancel',up);
+const ZOOM_SPEED=0.02;
+let gs=null, lastTouch=-1e9;
+view.addEventListener('wheel',e=>{
+  e.preventDefault(); stopAnim();
+  if(gs!==null) return;
+  const k=e.deltaMode===1?16:e.deltaMode===2?view.clientHeight:1;
+  if(e.ctrlKey||e.metaKey) zoomAt(Math.exp(-clamp(e.deltaY*k,-20,20)*ZOOM_SPEED),e.clientX,e.clientY);
+  else { x-=e.deltaX*k; y-=e.deltaY*k; apply(); }
+},{passive:false});
+document.addEventListener('gesturestart',e=>{ e.preventDefault(); if(pts.size||performance.now()-lastTouch<800) return; stopAnim(); gs=e.scale||1; });
+document.addEventListener('gesturechange',e=>{ e.preventDefault(); if(gs===null) return; const sc=e.scale||1; zoomAt(Math.pow(sc/gs,1.4),e.clientX,e.clientY); gs=sc; });
+document.addEventListener('gestureend',e=>{ e.preventDefault(); gs=null; });
+function zoomCenter(f){ const vr=view.getBoundingClientRect(), ns=clamp(s*f,MIN,MAX);
+  flyTo({s:ns, x:vr.width/2-(vr.width/2-x)*ns/s, y:vr.height/2-(vr.height/2-y)*ns/s},300); }
+document.getElementById('zi').onclick=()=>zoomCenter(1.5);
+document.getElementById('zo').onclick=()=>zoomCenter(1/1.5);
+
+const unscroll=()=>{ if(view.scrollTop||view.scrollLeft){ view.scrollTop=0; view.scrollLeft=0; } };
+view.addEventListener('scroll',unscroll);
+
+/* ---- the five writing blocks ---- */
+const tas=[...document.querySelectorAll('.wt')], wc=document.getElementById('wc'), undoBtn=document.getElementById('undoBtn');
+const WORD=/[A-Za-zÀ-ÿ0-9]+(?:['’-][A-Za-zÀ-ÿ]+)*/g;
+let cur=tas[0]; const caret=new Map();
+function setActive(ta){ cur=ta; document.querySelectorAll('.wblk').forEach(b=>b.classList.toggle('on',b.contains(ta))); }
+tas.forEach(ta=>{ try{ ta.value=localStorage.getItem(P+'-'+ta.id)||''; }catch(_){} });
+function grow(ta){ ta.style.height='auto'; ta.style.height=Math.max(260,ta.scrollHeight+30)+'px'; }
+function count(t){ return (t.match(WORD)||[]).length; }
+function refresh(ta){
+  if(ta){ grow(ta); ta.parentNode.querySelector('.bc').textContent=count(ta.value)?count(ta.value)+' palabras':''; try{localStorage.setItem(P+'-'+ta.id,ta.value);}catch(_){} }
+  const n=tas.reduce((a,t)=>a+count(t.value),0);
+  wc.textContent=n+' palabras en total';
+}
+tas.forEach(ta=>{
+  ta.addEventListener('input',()=>refresh(ta));
+  ta.addEventListener('focus',()=>setActive(ta));
+  ta.addEventListener('blur',()=>caret.set(ta,[ta.selectionStart,ta.selectionEnd]));
+});
+const undo=[];
+function insert(txt){
+  const ta=cur, v=ta.value;
+  const [a,b]=document.activeElement===ta?[ta.selectionStart,ta.selectionEnd]:(caret.get(ta)||[v.length,v.length]);
+  const before=v.slice(0,a), after=v.slice(b);
+  if(before && !/\s$/.test(before)) txt=' '+txt;
+  undo.push([ta,v]); if(undo.length>30) undo.shift(); undoBtn.disabled=false;
+  ta.value=before+txt+after;
+  const pos=(before+txt).length; caret.set(ta,[pos,pos]);
+  if(document.activeElement===ta) ta.setSelectionRange(pos,pos);
+  refresh(ta); toast('→ '+txt.trim());
+}
+undoBtn.onclick=()=>{ if(!undo.length) return; const [ta,v]=undo.pop(); ta.value=v; caret.delete(ta); refresh(ta); undoBtn.disabled=!undo.length; toast('Deshecho'); };
+document.getElementById('copyBtn').onclick=async()=>{
+  const all=[...document.querySelectorAll('.wblk')].map(b=>b.querySelector('h3').firstChild.nextSibling.textContent.trim()+'\n'+b.querySelector('.wt').value.trim()).join('\n\n');
+  try{ await navigator.clipboard.writeText(all); toast('Textos copiados'); }
+  catch(_){ cur.focus(); cur.select(); toast('Selecciona y copia'); }
+};
+let tt; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1400); }
+
+
+/* ---- Ask Google: type the English question, show a simple answer card ---- */
+const gq=document.getElementById('gq'), gres=document.getElementById('gres'), gtodo=document.getElementById('gtodo');
+gq.classList.add('ph0'); let gT;
+function search(b){
+  document.querySelectorAll('.gq').forEach(x=>x.classList.toggle('on',x===b));
+  clearInterval(gT); gres.hidden=true; gtodo.hidden=true; gq.classList.remove('ph0'); gq.textContent='';
+  const q=b.dataset.q; let i=0;
+  const done=()=>{ gq.textContent=q; document.getElementById('gsrc').textContent='Featured answer · '+q;
+    document.getElementById('ga').textContent=b.dataset.a; document.getElementById('gd').textContent=b.dataset.d; gres.hidden=false; gtodo.hidden=false; };
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
+  gT=setInterval(()=>{ i++; gq.textContent=q.slice(0,i); if(i>=q.length){ clearInterval(gT); setTimeout(done,350); } },35);
+}
+
+/* ---- taps ---- */
+view.addEventListener('click',e=>{
+  if(moved>8) return;                                   // that was a drag
+  const head=e.target.closest('.wblk-h');
+  if(head){ const ta=head.parentNode.querySelector('.wt'); setActive(ta); toast('Ahora escribes en: '+head.querySelector('h3').firstChild.nextSibling.textContent.trim()); return; }
+  const g=e.target.closest('.gq'); if(g){ search(g); return; }
+  const ph=e.target.closest('.ph');
+  if(ph){ insert(ph.dataset.ins||ph.textContent.trim()+' '); ph.classList.add('flash'); setTimeout(()=>ph.classList.remove('flash'),400); return; }
+  const card=e.target.closest('.card');
+  if(card && card.id!=='k-write') flyTo(fitTarget(worldRect(card),1.2));
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.nav [data-go], .top [data-go]'); if(b) goEl(b.dataset.go);
+});
+
+/* help */
+const help=document.getElementById('help');
+try{ if(localStorage.getItem(P+'-help')) help.hidden=true; }catch(_){}
+document.getElementById('helpOk').onclick=()=>{ help.hidden=true; try{localStorage.setItem(P+'-help','1');}catch(_){} };
+
+/* start on the whole map; re-fit once fonts and photos load unless she has already moved */
+function start(){ unscroll(); tas.forEach(refresh); const id=location.hash.slice(1); if(id&&document.getElementById(id)) goEl(id,0); else goAll(0); }
+let touched=false; view.addEventListener('pointerdown',()=>touched=true,{once:true});
+const again=()=>{ if(!touched) start(); };
+start(); addEventListener('load',again);
+if(document.fonts){ document.fonts.ready.then(again); document.fonts.addEventListener('loadingdone',again); }
+let rz; addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(!pts.size && !touched) goAll(300); },250); });
+})();
+</script>
+</body></html>

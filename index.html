@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Deniz en Madrid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* One study column, sticky nav with live score. Same colour code as the printed cuaderno:
+   presente green, perfecto violet, indefinido terracotta. */
+:root{
+  --bg:#FBF7F0;--surface:#fff;--ink:#1D2433;--muted:#5E6678;--line:#E2DDD3;
+  --pre:#1E7B67;--pre-soft:#E3F2EE;--per:#6A4BB5;--per-soft:#EEE9F8;--ind:#C2502E;--ind-soft:#FAEAE3;
+  --ok:#1F7A49;--ok-soft:#DDF1E5;--bad:#B42A22;--bad-soft:#F9E1DF;--gold:#C99A2E;--gold-soft:#FFF5DE;
+  --display:"Fraunces",Georgia,serif;--body:"Figtree",system-ui,sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14161C;--surface:#1D2028;--ink:#ECEAE4;--muted:#A3A8B4;--line:#323642;
+  --pre:#5CC9AE;--pre-soft:#16302A;--per:#AE96F0;--per-soft:#2A2340;--ind:#F08A66;--ind-soft:#3A2219;
+  --ok:#62C78F;--ok-soft:#163826;--bad:#F08178;--bad-soft:#3D1D1B;--gold:#E6B84F;--gold-soft:#332A14;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14161C;--surface:#1D2028;--ink:#ECEAE4;--muted:#A3A8B4;--line:#323642;
+  --pre:#5CC9AE;--pre-soft:#16302A;--per:#AE96F0;--per-soft:#2A2340;--ind:#F08A66;--ind-soft:#3A2219;
+  --ok:#62C78F;--ok-soft:#163826;--bad:#F08178;--bad-soft:#3D1D1B;--gold:#E6B84F;--gold-soft:#332A14;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:0 80px}
+h1,h2,h3{font-family:var(--display);line-height:1.12;margin:0;text-wrap:balance}
+h2{font-size:1.75rem;font-weight:600}h3{font-size:1.12rem;font-weight:600}
+p{margin:0}
+.pre{color:var(--pre)}.per{color:var(--per)}.ind{color:var(--ind)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.navin{max-width:820px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.links{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.links::-webkit-scrollbar{display:none}
+.links a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:600;font-size:.86rem;padding:6px 10px;border-radius:99px}
+.links a:hover{background:var(--surface);color:var(--ink)}
+.score{flex:none;font-weight:700;font-size:.9rem;background:var(--ink);color:var(--bg);padding:6px 12px;border-radius:99px}
+header{padding:44px 0 18px}
+.kick{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header h1{font-size:clamp(2.3rem,7vw,3.4rem);font-weight:600;margin:8px 0 10px}
+header p{color:var(--muted);font-size:1.08rem;max-width:36em}
+section{padding-top:44px;scroll-margin-top:60px}
+.lead{color:var(--muted);margin:8px 0 18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.tag{font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:6px;color:var(--bg)}
+.tag.pre{background:var(--pre)}.tag.per{background:var(--per)}.tag.ind{background:var(--ind)}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.zone{border-radius:14px;padding:14px}
+.zone h3{margin-bottom:4px}.zone p{font-size:.9rem;color:var(--muted);margin-bottom:8px}
+.zone ul{margin:0;padding-left:18px;font-size:.95rem}
+.zone.pre{background:var(--pre-soft)}.zone.per{background:var(--per-soft)}.zone.ind{background:var(--ind-soft)}
+.zone .tr{color:var(--muted);font-style:italic;font-size:.85rem}
+.tip{border-left:4px solid var(--gold);background:var(--gold-soft);border-radius:0 12px 12px 0;padding:12px 16px;margin-top:14px;font-size:.96rem}
+.tip b.h{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+/* buttons */
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:600;font-size:.95rem;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--muted)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.opt:focus-visible,.chip:focus-visible,.flip:focus-visible{outline:2px solid var(--per);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.list{display:grid;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.item .q{margin-bottom:10px}
+.why{font-size:.88rem;color:var(--muted);margin-top:8px}
+.why[hidden]{display:none}
+/* tabs + flip cards */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-weight:600;font-size:.9rem}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tgroup{display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%}
+.tglabel{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-right:4px;width:100%}
+#vtabs{flex-direction:column;gap:12px}
+.flips{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.flip{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:96px;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.flip .es{font-weight:700;font-size:1.02rem}
+.flip .en,.flip .trk{font-size:.88rem;color:var(--muted)}
+.flip .trk{font-style:italic}
+.flip:not(.open) .en,.flip:not(.open) .trk{visibility:hidden}
+.flip .hint{font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.flip.open .hint{display:none}
+/* time sort */
+.marker{font-family:var(--display);font-size:1.9rem;font-weight:600;text-align:center;padding:18px 0 6px}
+.marker small{display:block;font-family:var(--body);font-size:.9rem;color:var(--muted);font-weight:400;font-style:italic}
+.three-btn{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.three-btn .opt{padding:12px 6px}
+.three-btn .opt.pre{border-color:var(--pre);color:var(--pre)}.three-btn .opt.per{border-color:var(--per);color:var(--per)}.three-btn .opt.ind{border-color:var(--ind);color:var(--ind)}
+.feedback{min-height:1.6em;text-align:center;margin-top:10px;font-weight:600}
+.progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.progress i{display:block;height:100%;background:var(--ink);width:0;transition:width .3s}
+/* stories */
+.story p{line-height:2.4}
+.inl{display:inline-flex;gap:4px;vertical-align:baseline}
+.inl .opt{padding:1px 9px;font-size:.92rem}
+.story h3{margin-bottom:6px}
+.story .meta{font-size:.85rem;color:var(--muted);margin-bottom:6px}
+/* drill */
+.drill .prompt{font-size:1.15rem;margin:6px 0 12px}
+.drill .prompt b{font-family:var(--display);font-size:1.5rem}
+.drill input{font:inherit;font-size:1.15rem;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%;max-width:340px}
+.drill input:focus{outline:none;border-color:var(--per)}
+.drill .res{margin-top:10px;font-weight:600;min-height:1.6em}
+.pill{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:6px}
+.pill.pre{background:var(--pre-soft);color:var(--pre)}.pill.per{background:var(--per-soft);color:var(--per)}.pill.ind{background:var(--ind-soft);color:var(--ind)}
+.tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:14px}
+.tables table{width:100%;border-collapse:collapse;font-size:.9rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tables th{text-align:left;padding:6px 10px;font-family:var(--display)}
+.tables td{padding:3px 10px;border-top:1px solid var(--line)}
+.tables td:first-child{color:var(--muted);font-size:.8rem}
+details summary{cursor:pointer;font-weight:600;color:var(--muted);margin-top:14px}
+/* order */
+.built{min-height:48px;border:1.5px dashed var(--line);border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;font-weight:600;font-size:.95rem}
+.built .chip{border-color:var(--per)}
+.trans{font-size:.88rem;color:var(--muted);font-style:italic;margin-bottom:8px}
+/* dialogue */
+.bubble{display:inline-block;background:var(--bg);border-radius:14px 14px 14px 4px;padding:8px 12px;margin-bottom:10px}
+.who{font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.opts-col{display:grid;gap:8px}.opts-col .opt{text-align:left}
+/* route (metro line) */
+.route{margin-top:26px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 2px}
+.route::-webkit-scrollbar{display:none}
+.route ol{list-style:none;margin:0;padding:0;display:flex;min-width:640px;position:relative}
+.route ol::before{content:"";position:absolute;left:14px;right:14px;top:13px;height:4px;border-radius:4px;background:var(--line)}
+.route li{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+.route a{text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;gap:6px}
+.route .dot{width:30px;height:30px;border-radius:50%;background:var(--surface);border:3px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);transition:all .3s}
+.route .st{font-size:.74rem;font-weight:700;line-height:1.15}
+.route .sec{font-size:.68rem;color:var(--muted)}
+.route li.half .dot{border-color:var(--per);color:var(--per)}
+.route li.done .dot{background:var(--pre);border-color:var(--pre);color:var(--bg)}
+.route-msg{font-size:.9rem;color:var(--muted);margin-top:10px}
+/* deck */
+.deck{max-width:560px;margin:0 auto}
+.dcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 22px;min-height:290px;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:center}
+.dcard .stage{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.dcard .big{font-family:var(--display);font-size:clamp(2rem,8vw,2.7rem);font-weight:600;line-height:1.1}
+.dcard .mean{font-size:1.15rem;font-weight:600}.dcard .mean i{color:var(--muted);font-weight:400}
+.dcard .exs{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:1rem}
+.dcard .exs b{color:var(--per)}
+.dcard .q{font-size:1.1rem}
+.dcard input{font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%;max-width:320px;margin:0 auto}
+.dcard input:focus{outline:none;border-color:var(--per)}
+.dcard .opts-col{max-width:360px;margin:0 auto;width:100%}
+.dctrl{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
+.dctrl .opt{flex:1;padding:10px}
+.dctrl .main{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dmeta{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin:10px 2px 0}
+.linkbtn{background:none;border:none;color:var(--muted);text-decoration:underline;font-weight:600;font-size:.88rem;padding:0;margin-top:14px}
+/* sentence builder + writing */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.chips span{background:var(--per-soft);color:var(--per);border-radius:99px;padding:5px 12px;font-weight:600;font-size:.95rem}
+textarea{font:inherit;font-size:1rem;width:100%;min-height:76px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus{outline:none;border-color:var(--per)}
+.model{background:var(--ok-soft);color:var(--ink);border-radius:10px;padding:10px 12px;margin-top:10px}
+.model b{color:var(--ok)}
+.wc{font-size:.82rem;color:var(--muted)}
+/* keywords table */
+.kw-wrap{overflow-x:auto;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+table.kw{width:100%;border-collapse:collapse;min-width:640px;font-size:.95rem}
+table.kw th{text-align:left;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
+table.kw td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.kw tr:last-child td{border-bottom:none}
+table.kw td.t{width:21%}table.kw td.t b{font-family:var(--display);font-size:1.1rem;display:block}
+table.kw td.t span{font-size:.82rem;color:var(--muted)}
+table.kw .k{display:inline-block;border-radius:99px;padding:2px 10px;margin:0 4px 6px 0;font-weight:600;font-size:.9rem}
+table.kw .k i{font-weight:400;opacity:.75;margin-left:4px}
+tr.pre .k{background:var(--pre-soft);color:var(--pre)}tr.per .k{background:var(--per-soft);color:var(--per)}
+tr.ind .k{background:var(--ind-soft);color:var(--ind)}tr.fut .k{background:var(--gold-soft);color:var(--gold)}
+tr.pre td.t b{color:var(--pre)}tr.per td.t b{color:var(--per)}tr.ind td.t b{color:var(--ind)}tr.fut td.t b{color:var(--gold)}
+table.kw td.ex{width:24%}table.kw td.ex em{font-style:normal;font-weight:700}
+table.kw tr{color:var(--ink)}table.kw td.ex em.pre{color:var(--pre)}table.kw td.ex em.per{color:var(--per)}table.kw td.ex em.ind{color:var(--ind)}
+@media (max-width:640px){table.kw{min-width:0}table.kw,table.kw tbody,table.kw tr,table.kw td{display:block;width:auto!important}
+ table.kw tr:first-child{display:none}table.kw tr{border-bottom:1px solid var(--line);padding:12px 14px}table.kw tr:last-child{border-bottom:none}
+ table.kw td{padding:0;border:none}table.kw td.t{margin-bottom:8px}table.kw td.t b{display:inline;margin-right:8px}table.kw td.ex{margin-top:4px;font-size:.92rem}}
+.tr-note{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.tr-note h3{margin-bottom:6px}.tr-note p{margin-bottom:8px}.tr-note p:last-child{margin-bottom:0}
+footer{margin-top:56px;color:var(--muted);font-size:.85rem;text-align:center}
+.reset{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-weight:600;font-size:.85rem}
+@media (max-width:620px){.three{grid-template-columns:minmax(0,1fr)}body{font-size:16px}}
+</style></head>
+<body>
+<nav><div class="navin"><div class="links">
+<a href="mapa/" style="background:var(--ink);color:var(--bg)">✍︎ Mapa de escritura</a><a href="#claves">Claves</a><a href="#cuando">¿Cuándo?</a><a href="#vocab">A · Palabras</a><a href="#clasifica">B · Marcadores</a><a href="#elige">C · Elige</a><a href="#historias">D · Historias</a><a href="#tablas">E · Tablas</a><a href="#ordena">F · Ordena</a><a href="#restaurante">G · Restaurante</a><a href="#gusta">H · Gusta</a><a href="#frases">I · Frases</a><a href="#escribe">J · Escribe</a>
+</div><span class="score" id="score" aria-live="polite">0 / 0</span></div></nav>
+<div class="wrap">
+<header>
+  <div class="kick">Español A1 · Goya, Madrid</div>
+  <h1>Deniz en Madrid</h1>
+  <p>Presente y pasado para tu vida de verdad: el piso en Goya, las clases en IE, los restaurantes y los fines de semana.</p>
+  <div class="tags"><span class="tag pre">Presente · hablo</span><span class="tag per">Perfecto · he hablado</span><span class="tag ind">Indefinido · hablé</span></div>
+  <div class="route" role="navigation" aria-label="Tu ruta por Madrid"><ol id="route"></ol></div>
+  <p class="route-msg" id="routeMsg">Tu ruta por Madrid: each stop lights up when you finish its section.</p>
+</header>
+
+<section id="claves">
+  <h2>Las palabras clave</h2>
+  <p class="lead">Every tense has its own time words. Learn this table first: it is the key to everything on this page.</p>
+  <div class="kw-wrap"><table class="kw">
+    <tr><th>Tiempo</th><th>Palabras clave</th><th>Ejemplo</th></tr>
+    <tr class="pre"><td class="t"><b>Presente</b><span>şimdiki / geniş zaman</span></td>
+      <td><span class="k">ahora<i>şimdi</i></span><span class="k">normalmente<i>genellikle</i></span><span class="k">todos los días<i>her gün</i></span><span class="k">siempre<i>her zaman</i></span><span class="k">a veces<i>bazen</i></span><span class="k">los lunes<i>pazartesileri</i></span><span class="k">los fines de semana<i>hafta sonları</i></span></td>
+      <td class="ex">Normalmente <em class="pre">voy</em> a IE en metro.</td></tr>
+    <tr class="per"><td class="t"><b>Pretérito perfecto</b><span>he + participio</span></td>
+      <td><span class="k">hoy<i>bugün</i></span><span class="k">esta mañana<i>bu sabah</i></span><span class="k">esta semana<i>bu hafta</i></span><span class="k">este mes<i>bu ay</i></span><span class="k">este año<i>bu yıl</i></span><span class="k">ya<i>çoktan</i></span><span class="k">todavía no<i>henüz</i></span><span class="k">nunca<i>hiç</i></span><span class="k">alguna vez<i>hiç (soru)</i></span><span class="k">dos veces<i>iki kez</i></span></td>
+      <td class="ex">Esta semana <em class="per">he tenido</em> dos exámenes.</td></tr>
+    <tr class="ind"><td class="t"><b>Pretérito indefinido</b><span>hablé, comí, fui</span></td>
+      <td><span class="k">ayer<i>dün</i></span><span class="k">anteayer<i>evvelsi gün</i></span><span class="k">anoche<i>dün gece</i></span><span class="k">el sábado pasado<i>geçen cumartesi</i></span><span class="k">la semana pasada<i>geçen hafta</i></span><span class="k">el año pasado<i>geçen yıl</i></span><span class="k">en 2024<i>2024'te</i></span><span class="k">hace dos meses<i>iki ay önce</i></span></td>
+      <td class="ex">Ayer <em class="ind">cené</em> en un restaurante de Goya.</td></tr>
+    <tr class="fut"><td class="t"><b>Futuro</b><span>ir a + infinitivo</span></td>
+      <td><span class="k">mañana<i>yarın</i></span><span class="k">pasado mañana<i>öbür gün</i></span><span class="k">el próximo sábado<i>gelecek cumartesi</i></span><span class="k">la semana que viene<i>gelecek hafta</i></span><span class="k">el año que viene<i>gelecek yıl</i></span></td>
+      <td class="ex">El próximo sábado <em style="color:var(--gold)">voy a ir</em> a Toledo.</td></tr>
+  </table></div>
+  <div class="tr-note" lang="tr">
+    <h3>Anahtar kelimeler neden önemli?</h3>
+    <p>İspanyolcada hangi zamanı kullanacağını çoğu zaman fiil değil, cümledeki <b>zaman ifadesi</b> belirler. Türkçede <i>“bugün yedim”</i> ve <i>“dün yedim”</i> aynı fiili kullanır, ama İspanyolcada iki farklı fiil vardır: <b>hoy <span class="per">he comido</span></b> / <b>ayer <span class="ind">comí</span></b>.</p>
+    <p><b>Kural:</b> Zaman hâlâ açıksa (<i>hoy, esta semana, este año</i>) → <span class="per"><b>perfecto</b></span>. Zaman kapandıysa (<i>ayer, el sábado pasado, en 2024</i>) → <span class="ind"><b>indefinido</b></span>. Bir alışkanlıksa (<i>normalmente, todos los días</i>) → <span class="pre"><b>presente</b></span>.</p>
+    <p><b>İpucu:</b> Önce cümledeki anahtar kelimeyi bul ve altını çiz, sonra fiili seç. Anahtar kelimeyi bulursan, doğru zamanı da bulursun.</p>
+  </div>
+</section>
+
+<section id="cuando">
+  <h2>¿Cuándo empezamos a usar el pasado?</h2>
+  <p class="lead">In Spanish, the time word chooses the tense. Find the time word first, then pick the verb.</p>
+  <div class="three">
+    <div class="zone pre"><h3 class="pre">Presente</h3><p>Now, and things you do regularly.</p>
+      <ul><li>ahora <span class="tr">şimdi</span></li><li>normalmente <span class="tr">genellikle</span></li><li>todos los días <span class="tr">her gün</span></li><li>siempre <span class="tr">her zaman</span></li><li>los fines de semana</li></ul>
+      <p style="margin-top:8px;color:var(--ink)"><b class="pre">Ceno</b> a las nueve.</p></div>
+    <div class="zone per"><h3 class="per">Perfecto</h3><p>The time box is still open, or a life experience with no date.</p>
+      <ul><li>hoy <span class="tr">bugün</span></li><li>esta mañana <span class="tr">bu sabah</span></li><li>esta semana / este año</li><li>ya · todavía no <span class="tr">henüz</span></li><li>nunca · alguna vez · dos veces</li></ul>
+      <p style="margin-top:8px;color:var(--ink)">Hoy <b class="per">he cenado</b> sushi.</p></div>
+    <div class="zone ind"><h3 class="ind">Indefinido</h3><p>The time box is closed: finished and dated.</p>
+      <ul><li>ayer <span class="tr">dün</span></li><li>anoche <span class="tr">dün gece</span></li><li>el sábado pasado</li><li>la semana pasada <span class="tr">geçen hafta</span></li><li>en 2024 · hace dos meses</li></ul>
+      <p style="margin-top:8px;color:var(--ink)">Anoche <b class="ind">cené</b> en Goya.</p></div>
+  </div>
+  <div class="tip"><b class="h">Türkçe ipucu</b>In Turkish, <i>bugün yedim</i> and <i>dün yedim</i> use the same verb. In Spanish they don't:
+    <b>hoy</b> is still open → <b class="per">he comido</b>; <b>ayer</b> is closed → <b class="ind">comí</b>.</div>
+</section>
+
+<section id="vocab">
+  <h2>A · Palabras de tu vida</h2>
+  <p class="lead">One card at a time: say the word, flip it, then three quick exercises. Choose a topic.</p>
+  <div class="tabs" role="tablist" id="vtabs"></div>
+  <div class="deck" id="deck">
+    <div class="dcard" id="dcard" aria-live="polite"></div>
+    <div class="dctrl"><button class="opt" id="vback">← Anterior</button><button class="opt main" id="vnext">Voltear ↺</button></div>
+    <div class="dmeta"><span id="vcount"></span><span id="vstage"></span></div>
+    <div class="progress"><i id="vbar"></i></div>
+  </div>
+  <button class="linkbtn" id="vlist">Ver la lista completa</button>
+  <div class="flips" id="flips" hidden style="margin-top:14px"></div>
+</section>
+
+<section id="clasifica">
+  <h2>B · ¿Presente, perfecto o indefinido?</h2>
+  <p class="lead">Which tense goes with this time word?</p>
+  <div class="card">
+    <div class="marker" id="mk"></div>
+    <div class="three-btn">
+      <button class="opt pre" data-t="pre">Presente</button><button class="opt per" data-t="per">Perfecto</button><button class="opt ind" data-t="ind">Indefinido</button>
+    </div>
+    <div class="feedback" id="mkfb" aria-live="polite"></div>
+    <div class="progress"><i id="mkbar"></i></div>
+  </div>
+</section>
+
+<section id="elige">
+  <h2>C · Elige el verbo</h2>
+  <p class="lead">Sentences from your week. Find the time word, then tap the verb.</p>
+  <div class="list" id="listC"></div>
+</section>
+
+<section id="historias">
+  <h2>D · Mini-historias</h2>
+  <p class="lead">Read each story and choose the right verb in every gap. The story has to make sense from start to finish.</p>
+  <div class="list" id="stories"></div>
+</section>
+
+<section id="tablas">
+  <h2>E · Las tablas, de memoria</h2>
+  <p class="lead">Type the form and press Enter. Accents count, but a missing accent only costs you half a point.</p>
+  <div class="card drill">
+    <div class="tabs" id="dtabs"></div>
+    <div class="prompt" id="dprompt"></div>
+    <div class="row"><input id="dinput" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your answer"><button class="opt" id="dcheck">Comprobar</button><button class="opt" id="dskip">Otra</button></div>
+    <div class="res" id="dres" aria-live="polite"></div>
+    <details><summary>Ver las tablas</summary><div class="tables" id="dtables"></div></details>
+  </div>
+</section>
+
+<section id="ordena">
+  <h2>F · Ordena la frase</h2>
+  <p class="lead">Tap the words in order. Tap a word in the top line to send it back.</p>
+  <div class="list" id="listF"></div>
+</section>
+
+<section id="restaurante">
+  <h2>G · En el restaurante</h2>
+  <p class="lead">You're at a restaurant in Goya with Alvi. Choose what you say.</p>
+  <div class="list" id="listG"></div>
+</section>
+
+<section id="gusta">
+  <h2>H · ¿Gusta o gustan? ¿Gustó o gustaron?</h2>
+  <p class="lead">One thing or a verb → gusta / gustó. Many things → gustan / gustaron.</p>
+  <div class="list" id="listH"></div>
+</section>
+
+<section id="frases">
+  <h2>I · Construye la frase</h2>
+  <p class="lead">Use all the words to write one complete sentence in the tense shown. Add articles, prepositions and endings. Then compare with the model.</p>
+  <div class="list" id="listI"></div>
+</section>
+
+<section id="escribe">
+  <h2>J · Escribe</h2>
+  <p class="lead">Write freely. Your text stays saved on this device. When you finish, compare with the model and underline your time words.</p>
+  <div class="list" id="listJ"></div>
+</section>
+
+<footer><button class="reset" id="reset">Empezar de nuevo</button><p style="margin-top:12px">Hecho para Deniz · noviembre 2026</p></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+let right=0,total=0,lastSec=null;
+const done={};
+["click","keydown"].forEach(ev=>document.addEventListener(ev,e=>{const sc=e.target.closest&&e.target.closest("section");if(sc)lastSec=sc.id},true));
+function mark(ok,w=1,sec){total+=1;right+=ok?w:0;$("#score").textContent=`${+right.toFixed(1)} / ${total}`;
+ const id=sec||lastSec;if(id){done[id]=(done[id]||0)+1;paintRoute()}}
+/* route: one metro stop per section; need = answers to complete it */
+const ROUTE=[["vocab","Goya","A",15],["clasifica","Retiro","B",18],["elige","Sol","C",14],["historias","Malasaña","D",30],["tablas","IE","E",15],["ordena","Serrano","F",8],["restaurante","La Latina","G",8],["gusta","San Ginés","H",8],["frases","Chueca","I",8],["escribe","Lavapiés","J",3]];
+$("#route").innerHTML=ROUTE.map(([id,st,l])=>`<li data-id="${id}"><a href="#${id}"><span class="dot">${l}</span><span class="st">${st}</span></a></li>`).join("");
+function paintRoute(){let n=0;ROUTE.forEach(([id,st,l,need])=>{const li=document.querySelector(`#route li[data-id="${id}"]`);const d=done[id]||0;
+  li.classList.toggle("done",d>=need);li.classList.toggle("half",d>0&&d<need);li.querySelector(".dot").textContent=d>=need?"✓":l;if(d>=need)n++});
+ $("#routeMsg").textContent=n===ROUTE.length?"¡Has recorrido todo Madrid! 🎉 Every stop done.":`Tu ruta por Madrid: ${n} / ${ROUTE.length} stops done.`}
+paintRoute();
+
+/* ---------- A · vocab deck: [es, en, tr, example with [cloze]] ---------- */
+const VOCAB={
+ "Restaurante":[["la carta","the menu","menü","¿Me trae [la carta], por favor?"],["el camarero / la camarera","waiter / waitress","garson","[El camarero] del bar de Goya es muy simpático."],["el menú del día","set lunch menu","günün menüsü","[El menú del día] cuesta quince euros."],["de primero","as a starter","başlangıç olarak","[De primero] quiero gazpacho."],["de segundo","as a main course","ana yemek olarak","[De segundo], pollo con patatas."],["el postre","dessert","tatlı","De [postre], tarta de queso."],["la bebida","drink","içecek","¿Y de [bebida]? —Agua con gas."],["la cuenta","the bill","hesap","[La cuenta], por favor."],["la propina","the tip","bahşiş","En España [la propina] no es obligatoria."],["reservar una mesa","to book a table","masa ayırtmak","He [reservado] una mesa para las nueve."],["¿Qué vas a tomar?","What will you have?","Ne alırsın?","—¿Qué vas a [tomar]? —Una caña."],["Para mí, …","For me, …","Benim için …","[Para mí], una ensalada."]],
+ "Comida":[["el pollo","chicken","tavuk","De segundo pido [pollo] con patatas."],["el pescado","fish","balık","Ayer comí [pescado] en un restaurante gallego."],["la carne","meat","et","No como mucha [carne]."],["la ensalada","salad","salata","Siempre pido una [ensalada] de primero."],["la tortilla de patatas","Spanish potato omelette","patatesli omlet","Me encanta [la tortilla] de patatas."],["las croquetas","croquettes","kroket","[Las croquetas] de jamón son las más famosas."],["el queso","cheese","peynir","El [queso] manchego es de España."],["el pan","bread","ekmek","En el menú del día, el [pan] está incluido."],["el ajo","garlic","sarımsak","No me gusta nada el [ajo]."],["la cebolla","onion","soğan","¿La tortilla tiene [cebolla]?"],["el agua con gas","sparkling water","maden suyu","Para mí, [agua con gas]."],["una caña","a small beer","küçük bira","Después de clase tomamos [una caña]."]],
+ "Mi barrio":[["el piso","flat","daire","Mi [piso] está en la calle de Goya."],["el barrio","neighbourhood","mahalle","Goya es un [barrio] elegante y tranquilo."],["la calle","street","sokak","[La calle] de Goya tiene muchas tiendas."],["la parada de metro","metro stop","metro durağı","[La parada de metro] está al lado de mi casa."],["la tienda","shop","dükkân","En mi barrio hay muchas [tiendas] de ropa."],["el supermercado","supermarket","süpermarket","El [supermercado] cierra a las diez."],["la farmacia","pharmacy","eczane","[La farmacia] está en la esquina."],["el parque","park","park","El Retiro es mi [parque] favorito."],["cerca de","near","yakınında","Vivo muy [cerca del] Retiro."],["lejos de","far from","uzağında","Mi familia está [lejos de] Madrid."],["al lado de","next to","yanında","Hay un café [al lado de] mi piso."],["ruidoso / tranquilo","noisy / quiet","gürültülü / sakin","Mi calle es [tranquila], pero Malasaña es ruidosa."]],
+ "En IE":[["la clase","class","ders","[La clase] de marketing es a las nueve."],["el profesor / la profesora","teacher","öğretmen, hoca","Mi [profesor] habla muy rápido."],["los compañeros","classmates","sınıf arkadaşları","Mis [compañeros] son de muchos países."],["la asignatura","subject","ders (konu)","¿Cuál es tu [asignatura] favorita?"],["el examen","exam","sınav","Mañana tengo un [examen]."],["la biblioteca","library","kütüphane","Estudio en [la biblioteca] por la tarde."],["el trabajo en grupo","group project","grup çalışması","Esta semana hemos hecho un [trabajo en grupo]."],["la presentación","presentation","sunum","[La presentación] fue un éxito."],["los deberes","homework","ödev","Todavía no he hecho [los deberes]."],["aprobar","to pass","geçmek","¡He [aprobado] el examen!"],["suspender","to fail","kalmak","Nunca he [suspendido] un examen."],["estar cansada","to be tired","yorgun olmak","Hoy [estoy] muy cansada."]],
+ "Mi día":[["levantarse","to get up","kalkmak","Me [levanto] a las ocho."],["ducharse","to shower","duş almak","Me [ducho] por la mañana."],["desayunar","to have breakfast","kahvaltı yapmak","[Desayuno] café con leche."],["comer","to have lunch / eat","öğle yemeği yemek","[Como] con mis compañeros a las dos."],["cenar","to have dinner","akşam yemeği yemek","Los españoles [cenan] a las diez."],["ir a clase","to go to class","derse gitmek","[Voy] a clase en metro."],["volver a casa","to go back home","eve dönmek","[Vuelvo] a casa a las siete."],["quedar con amigos","to meet friends","arkadaşlarla buluşmak","El viernes [quedo] con mis amigos en Malasaña."],["salir de fiesta","to go partying","eğlenmeye çıkmak","Ayer [salí] de fiesta hasta las cuatro."],["ir de compras","to go shopping","alışverişe gitmek","Los sábados [voy] de compras."],["ir de copas","to go for drinks","içmeye çıkmak","¿[Vamos] de copas esta noche?"],["acostarse","to go to bed","yatmak","Me [acuesto] a las doce."]],
+ "Opiniones":[["Me encanta","I love it","Bayılıyorum","Me [encanta] Madrid."],["Me gusta mucho","I like it a lot","Çok seviyorum","Me gusta [mucho] el Retiro."],["No me gusta nada","I don't like it at all","Hiç sevmiyorum","No me gusta [nada] el frío."],["Prefiero …","I prefer …","… tercih ederim","[Prefiero] el té al café."],["¡Qué rico!","How tasty!","Ne lezzetli!","¡Qué [rico] está este gazpacho!"],["Está muy salado","It's too salty","Çok tuzlu","La sopa está muy [salada]."],["Es caro / barato","It's expensive / cheap","Pahalı / ucuz","El barrio de Salamanca es [caro]."],["Está lleno","It's full (packed)","Dolu","El restaurante está [lleno]: no hay mesas."],["Me encantó","I loved it (past)","Bayıldım","La cena de anoche me [encantó]."],["No me gustó","I didn't like it (past)","Beğenmedim","La película no me [gustó]."],["Estoy llena","I'm full (food)","Doydum","No quiero postre, estoy [llena]."],["¡Qué asco!","Yuck!","İğrenç!","¡Qué [asco]! Hay un pelo en la sopa."]]
+};
+
+/* more decks: vocabulary from the older pages (Andresinp/Espa-ol, A1spaniah), Turkish checked, examples rewritten for Madrid */
+const VOCAB2={
+ "La ropa":[["la camiseta","t-shirt","tişört","Hoy llevo una [camiseta] blanca y vaqueros."],["los pantalones","trousers","pantolon","En invierno llevo [pantalones] largos."],["los vaqueros","jeans","kot pantolon","Los [vaqueros] de esta tienda son baratos."],["el vestido","dress","elbise","Para la boda me he comprado un [vestido] rojo."],["la camisa","shirt","gömlek","Para la entrevista llevo una [camisa] blanca."],["la chaqueta","jacket","ceket","En noviembre necesito una [chaqueta]."],["el zapato","shoe","ayakkabı","Estos [zapatos] son muy cómodos."],["la bota","boot","bot, çizme","En invierno llevo [botas] negras."],["las sandalias","sandals","sandalet","En verano llevo [sandalias]."],["la bufanda","scarf","atkı","Hace frío: me pongo la [bufanda]."],["el guante","glove","eldiven","Hace mucho frío: necesito unos [guantes]."],["el gorro","beanie","bere","Me pongo el [gorro] de lana."],["la gorra","cap","kep, şapka","En el Retiro llevo una [gorra] porque hace sol."],["el cinturón","belt","kemer","Este [cinturón] es de cuero."],["la corbata","tie","kravat","En la entrevista mi compañero lleva [corbata]."],["el traje","suit","takım elbise","El profesor siempre lleva [traje]."],["el bañador","swimsuit","mayo","Para la playa de Marbella necesito un [bañador]."],["las gafas","glasses","gözlük","No veo bien sin mis [gafas]."],["el bolso","handbag","el çantası","Mi [bolso] es de cuero negro."],["la mochila","backpack","sırt çantası","Llevo el portátil en la [mochila]."],["la ropa interior","underwear","iç çamaşırı","La [ropa interior] está en el armario."],["llevar","to wear","giymek, takmak","Hoy [llevo] un vestido azul."],["ponerse","to put on","giymek (üstüne)","Hace frío, me [pongo] la chaqueta."],["cómodo / cómoda","comfortable","rahat","Estas botas son muy [cómodas]."]],
+ "Telas y tallas":[["la seda","silk","ipek","Mi bufanda es de [seda]."],["el algodón","cotton","pamuk","Esta camiseta es de [algodón]."],["la lana","wool","yün","El gorro es de [lana]."],["el lino","linen","keten","En verano llevo ropa de [lino]."],["el cuero","leather","deri","Mi chaqueta es de [cuero]."],["la piel","skin, leather","deri, cilt","Este bolso es de [piel]."],["de cuadros","checked","kareli","Me gusta la camisa de [cuadros]."],["la talla","size (clothes)","beden","¿Qué [talla] tienes? —La M."],["largo / larga","long","uzun","Me gusta el vestido [largo]."],["corto / corta","short (length)","kısa","En verano llevo pantalones [cortos]."],["sencillo / sencilla","simple","sade, basit","Prefiero la ropa [sencilla]."],["resistente","strong, durable","dayanıklı","Estas botas son muy [resistentes]."]],
+ "Colores":[["azul","blue","mavi","El cielo de Madrid es muy [azul]."],["verde","green","yeşil","El Retiro es muy [verde] en primavera."],["rojo / roja","red","kırmızı","La bandera turca es [roja] y blanca."],["blanco / blanca","white","beyaz","Los taxis de Madrid son [blancos]."],["negro / negra","black","siyah","Llevo un vestido [negro] para la fiesta."],["gris","grey","gri","Hoy el cielo está [gris]."],["marrón","brown","kahverengi","Mis botas son [marrones]."],["rosa","pink","pembe","Me encanta tu bolso [rosa]."],["naranja","orange","turuncu","Mi bufanda es [naranja]."],["amarillo / amarilla","yellow","sarı","En otoño los árboles son [amarillos]."],["lila","lilac","lila, leylak rengi","Las flores del Retiro son [lilas]."],["beige","beige","bej","Prefiero los pantalones [beige]."]],
+ "Familia":[["el padre / la madre","father / mother","baba / anne","Mi [madre] vive en Estambul."],["el hermano","brother","erkek kardeş, ağabey","Mi tío es el [hermano] de mi padre."],["la hermana","sister","kız kardeş, abla","¿Tu [hermana] también vive en Turquía?"],["el tío","uncle","amca, dayı","¿Dónde vive tu [tío]?"],["la tía","aunt","teyze, hala","Mi [tía] es la hermana de mi madre."],["el primo / la prima","cousin","kuzen","Mi [primo] es el hijo de mi tío."],["el abuelo","grandfather","büyükbaba, dede","Mi [abuelo] tiene ochenta años."],["la abuela","grandmother","büyükanne, nine","Mi [abuela] cocina muy bien."],["el nieto / la nieta","grandson / granddaughter","torun","Yo soy la [nieta] de mis abuelos."],["el hijo","son","oğul","El [hijo] de mi tía es mi primo."],["la hija","daughter","kız evlat","La [hija] de mi hermano es mi sobrina."],["el sobrino / la sobrina","nephew / niece","yeğen","El hijo de mi hermana es mi [sobrino]."],["el marido","husband","koca, eş","El [marido] de mi profesora es español."],["la mujer","woman, wife","kadın, eş","La [mujer] de mi profesor es turca."],["el novio / la novia","boyfriend / girlfriend","erkek / kız arkadaş, sevgili","¿Tienes [novio]?"],["la boda","wedding","düğün","El sábado fui a una [boda] en Toledo."],["mayor","older","büyük (yaşça)","Mi hermana es [mayor] que yo."],["menor","younger","küçük (yaşça)","Mi hermano es [menor] que yo."]],
+ "Cómo es":[["alto / alta","tall","uzun boylu","Mi compañero es muy [alto]: casi dos metros."],["bajo / baja","short (height)","kısa boylu","Mi profesora es [baja] y morena."],["delgado / delgada","thin","zayıf","Ella es [delgada] y tiene el pelo largo."],["gordo / gorda","fat","şişman","Mi gato está un poco [gordo]."],["guapo / guapa","good-looking","yakışıklı / güzel","El camarero del bar es muy [guapo]."],["feo / fea","ugly","çirkin","Este edificio es muy [feo]."],["rubio / rubia","blond","sarışın","Mi amiga sueca es [rubia]."],["moreno / morena","dark-haired","esmer","Mi profesor es [moreno] y tiene barba."],["castaño / castaña","brown (hair)","kumral","Tiene el pelo [castaño]."],["el pelo","hair","saç","¿De qué color tienes el [pelo]?"],["los ojos","eyes","gözler","¿De qué color tienes los [ojos]?"],["la barba","beard","sakal","Mi profesor tiene [barba]."],["el bigote","moustache","bıyık","Mi abuelo tiene [bigote]."],["la cabeza","head","baş, kafa","Hoy me duele la [cabeza]."]],
+ "Carácter":[["amable","kind","nazik","El camarero fue muy [amable] con nosotros."],["simpático / simpática","nice, friendly","sevimli, cana yakın","Mis compañeros de IE son muy [simpáticos]."],["tímido / tímida","shy","utangaç","Mi compañero es [tímido]: no habla mucho en clase."],["alegre","cheerful","neşeli","Los madrileños son muy [alegres]."],["serio / seria","serious","ciddi","El profesor de finanzas es muy [serio]."],["inteligente","intelligent","zeki","Mi compañera es muy [inteligente]."],["divertido / divertida","fun, funny","eğlenceli","La fiesta de anoche fue muy [divertida]."],["aburrido / aburrida","boring","sıkıcı","La película fue muy [aburrida]."],["sociable","sociable","sosyal, girişken","Soy [sociable]: me gusta conocer gente."],["abierto / abierta","outgoing, open","dışa dönük","Una persona [abierta] habla con todo el mundo."],["optimista","optimistic","iyimser","Soy [optimista]: todo va a ir bien."],["impaciente","impatient","sabırsız","No me gusta esperar: soy muy [impaciente]."],["atractivo / atractiva","attractive","çekici","Madrid es una ciudad muy [atractiva]."],["interesante","interesting","ilginç","La clase de hoy ha sido muy [interesante]."]],
+ "El tiempo":[["hace sol","it's sunny","hava güneşli","Hoy hace [sol] en Madrid."],["las nubes","clouds","bulutlar","Hoy hay muchas [nubes]."],["el viento","wind","rüzgâr","En Estambul hace mucho [viento]."],["llueve (llover)","it rains","yağmur yağıyor","En Londres [llueve] mucho."],["nieva (nevar)","it snows","kar yağıyor","En la sierra de Madrid [nieva] en invierno."],["está nublado","it's cloudy","hava bulutlu","Hoy está [nublado]."],["hace calor","it's hot","hava sıcak","En agosto hace mucho [calor] en Madrid."],["hace frío","it's cold","hava soğuk","En enero hace [frío]."],["hace buen tiempo","the weather is nice","hava güzel","Hoy hace [buen tiempo]: vamos al Retiro."],["hace mal tiempo","the weather is bad","hava kötü","Hace [mal tiempo]: me quedo en casa."],["el clima","climate","iklim","El [clima] de Madrid es seco."],["húmedo / húmeda","humid","nemli","Estambul es más [húmedo] que Madrid."],["seco / seca","dry","kuru","Madrid tiene un clima muy [seco]."],["cálido / cálida","warm","ılık, sıcak","El clima de Marbella es [cálido]."],["templado / templada","mild","ılıman","En primavera el tiempo es [templado]."]],
+ "Estaciones y lugares":[["la primavera","spring","ilkbahar","En [primavera] el Retiro tiene muchas flores."],["el verano","summer","yaz","En [verano] voy a la playa."],["el otoño","autumn","sonbahar","En [otoño] los árboles son amarillos."],["el invierno","winter","kış","En [invierno] hace frío en Madrid."],["el norte","north","kuzey","Santander está en el [norte] de España."],["el sur","south","güney","Marbella está en el [sur] de España."],["el este","east","doğu","Valencia está en el [este] de España."],["el oeste","west","batı","Portugal está al [oeste] de España."],["la plaza","square","meydan","La [Plaza] Mayor está en el centro."],["el lugar","place","yer","El Retiro es mi [lugar] favorito."],["la selva","jungle","yağmur ormanı, cangıl","Nunca he estado en una [selva] tropical."],["situado / situada","located","konumlu, bulunan","Mi piso está [situado] en Goya."],["poblado / poblada","populated","kalabalık, nüfuslu","Estambul es una ciudad muy [poblada]."],["la gente","people","insanlar","En el metro hay mucha [gente]."],["la excursión","trip, outing","gezi","El sábado hicimos una [excursión] a Segovia."]],
+ "De compras":[["el centro comercial","shopping centre","alışveriş merkezi","El sábado fui al [centro comercial] con Alvi."],["el dependiente / la dependienta","shop assistant","satış görevlisi","La [dependienta] es muy amable."],["el descuento","discount","indirim","En enero hay muchos [descuentos]."],["la tarjeta de crédito","credit card","kredi kartı","¿Puedo pagar con [tarjeta]?"],["el dinero","money","para","No tengo [dinero] en efectivo."],["¿Cuánto cuesta?","How much is it?","Ne kadar? Kaç para?","¿[Cuánto cuesta] esta chaqueta?"],["costar","to cost","tutmak (fiyat)","Los zapatos [cuestan] ochenta euros."],["barato / barata","cheap","ucuz","En el Rastro la ropa es muy [barata]."],["caro / cara","expensive","pahalı","Las tiendas de Serrano son muy [caras]."],["cerrado / cerrada","closed","kapalı","Los domingos muchas tiendas están [cerradas]."],["abierto / abierta","open","açık","El supermercado está [abierto] hasta las diez."],["buscar","to look for","aramak","[Busco] un regalo para mi madre."],["elegir","to choose","seçmek","No sé qué vestido [elegir]."],["vender","to sell","satmak","En el Rastro [venden] ropa antigua."],["regalar","to give (a present)","hediye etmek","Para su cumpleaños le [regalé] un libro."],["el carné de identidad","ID card","kimlik kartı","¿Tienes el [carné de identidad]?"],["la llave","key","anahtar","No encuentro la [llave] de casa."],["el medicamento","medicine","ilaç","En la farmacia compro un [medicamento]."]],
+ "Verbos 1":[["encontrar","to find","bulmak","Ayer [encontré] un restaurante muy bueno en Lavapiés."],["sentirse","to feel","hissetmek","Hoy me [siento] un poco cansada."],["contar","to tell, to count","anlatmak, saymak","Mi abuela me [cuenta] historias de Estambul."],["dormir","to sleep","uyumak","Anoche [dormí] solo cinco horas."],["reír","to laugh","gülmek","Con mis amigos me [río] mucho."],["lavar","to wash","yıkamak","Los domingos [lavo] la ropa."],["recibir","to receive","almak (gelen)","Ayer [recibí] un paquete de Turquía."],["jugar","to play","oynamak","¿[Juegas] al tenis?"],["escuchar","to listen","dinlemek","En el metro [escucho] música."],["trabajar","to work","çalışmak","¿[Trabajas] o estudias?"],["pedir","to ask for, to order","istemek, sipariş vermek","En el restaurante yo [pedí] croquetas."],["poder","can, to be able","-ebilmek","¿[Puedo] pagar con tarjeta?"],["empezar","to start","başlamak","Las clases [empiezan] a las nueve."],["leer","to read","okumak","[Leo] las noticias en español."],["visitar","to visit","ziyaret etmek","El domingo [visité] el Museo del Prado."],["perder","to lose","kaybetmek","Ayer [perdí] las llaves de casa."]],
+ "Verbos 2":[["ver","to see, to watch","görmek, izlemek","Anoche [vi] una película española."],["decir","to say","söylemek","¿Qué [dice] el profesor?"],["seguir","to follow, to continue","takip etmek, devam etmek","[Sigo] a muchos españoles en Instagram."],["despertarse","to wake up","uyanmak","Hoy me he [despertado] a las siete."],["bailar","to dance","dans etmek","En la fiesta [bailamos] hasta las tres."],["viajar","to travel","seyahat etmek","Me encanta [viajar] por España."],["aprender","to learn","öğrenmek","Este año he [aprendido] mucho español."],["recordar","to remember","hatırlamak","No [recuerdo] su nombre."],["cocinar","to cook","yemek pişirmek","Hoy he [cocinado] pasta para mis amigos."],["entender","to understand","anlamak","No [entiendo] al camarero: habla muy rápido."],["repetir","to repeat","tekrar etmek","¿Puede [repetir], por favor?"],["prestar","to lend","ödünç vermek","¿Me [prestas] tu cargador?"],["usar","to use","kullanmak","[Uso] el metro todos los días."],["poner","to put","koymak","[Pongo] las llaves en el bolso."],["escribir","to write","yazmak","He [escrito] un correo a mi profesor."],["soñar","to dream","rüya görmek, hayal etmek","[Sueño] con vivir en Madrid muchos años."],["guardar","to keep, to save","saklamak","[Guardo] el dinero en el bolso."],["amar","to love (a person)","sevmek (aşkla)","[Amo] a mi familia."]],
+ "Preguntas y saludos":[["¿Qué?","what?","ne?","¿[Qué] vas a hacer el sábado?"],["¿Cuándo?","when?","ne zaman?","¿[Cuándo] es el examen?"],["¿Dónde?","where?","nerede?","¿[Dónde] está la parada de metro?"],["¿Cómo?","how?","nasıl?","¿[Cómo] vas a IE? —En metro."],["¿Por qué?","why?","neden?","¿[Por qué] estudias español? —Porque vivo en Madrid."],["¿Cuántos? / ¿Cuántas?","how many?","kaç tane?","¿[Cuántos] idiomas hablas?"],["¿Quién?","who?","kim?","¿[Quién] es tu profesor?"],["¿Qué tal?","how's it going?","nasılsın? naber?","—¿[Qué tal]? —¡Muy bien!"],["Hola","hello","merhaba","¡[Hola]! ¿Cómo estás?"],["Adiós","goodbye","hoşça kal","[Adiós], ¡hasta mañana!"],["Hasta luego","see you later","görüşürüz","Me voy a clase. ¡[Hasta luego]!"],["Hasta pronto","see you soon","yakında görüşürüz","Vuelvo a Estambul en Navidad. ¡[Hasta pronto]!"],["Por supuesto","of course","tabii ki","—¿Vienes a la fiesta? —¡[Por supuesto]!"],["Creo que…","I think that…","bence, sanırım","[Creo que] el examen es el lunes."]],
+ "Palabras pequeñas":[["también","also, too","de, da, ayrıca","Hablo turco, inglés y [también] francés."],["pero","but","ama","Me gusta Madrid, [pero] echo de menos Estambul."],["porque","because","çünkü","Estudio español [porque] vivo en Madrid."],["además","besides, also","ayrıca","Mi piso es bonito y [además] está cerca del metro."],["últimamente","lately","son zamanlarda","[Últimamente] tengo muchos exámenes."],["desde","since, from","-den beri, -den","Vivo en Madrid [desde] septiembre."],["casi","almost","neredeyse","Son [casi] las doce."],["luego","later, then","sonra","Primero estudio y [luego] salgo con mis amigos."],["aquí","here","burada","[Aquí] hay un restaurante muy bueno."],["allí","there","orada","¿Ves ese bar? [Allí] ceno los viernes."],["todo","everything","her şey","Me gusta [todo] de Madrid."],["nada","nothing","hiçbir şey","No entiendo [nada]."],["alguien","someone","birisi","¿Hay [alguien] en casa?"],["poco","a little, few","az","Hablo [poco] español, pero aprendo rápido."],["bastante","quite, enough","oldukça, yeterince","El español es [bastante] fácil."],["con","with","ile","Voy al cine [con] mis amigos."],["para","for, in order to","için","Estudio [para] el examen."],["fácil / difícil","easy / difficult","kolay / zor","El indefinido es un poco [difícil]."]],
+ "Días y horas":[["el día","day","gün","Hoy es un [día] precioso."],["la semana","week","hafta","Tengo clase cinco días a la [semana]."],["el fin de semana","weekend","hafta sonu","El [fin de semana] voy a Toledo."],["por la mañana","in the morning","sabahleyin","Por la [mañana] voy a clase."],["por la tarde","in the afternoon","öğleden sonra","Por la [tarde] hago yoga."],["por la noche","at night","geceleyin, akşam","Por la [noche] salgo con mis amigos."],["la hora","hour, time","saat","¿Qué [hora] es? —Son las tres."],["mañana","tomorrow","yarın","[Mañana] tengo un examen."],["las vacaciones","holidays","tatil","En [vacaciones] vuelvo a Estambul."],["tarde","late","geç","Los españoles cenan muy [tarde]."],["temprano","early","erken","Me levanto [temprano] para ir a clase."],["tener hambre","to be hungry","acıkmak, aç olmak","Son las dos y [tengo] mucha hambre."],["tener sueño","to be sleepy","uykusu gelmek","Anoche dormí poco y hoy tengo [sueño]."]]
+};
+const GROUPS={"Mi vida en Madrid":Object.keys(VOCAB),"Más vocabulario":Object.keys(VOCAB2)};
+Object.assign(VOCAB,VOCAB2);
+const STAGES=["Palabra","Significado","¿Qué significa?","Completa","Traduce"];
+const norm=x=>x.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[¿?¡!.,…—:;]/g," ").replace(/\s+/g," ").trim();
+const soft=x=>x.toLowerCase().replace(/[¿?¡!.,…—:;]/g," ").replace(/\s+/g," ").trim();
+const ART=/^(el|la|los|las|un|una|unos|unas) /;
+function grade(input,answer){ // 1 exact, .5 only accents wrong, 0 wrong
+ const alts=answer.split("/").map(a=>a.trim()).flatMap(a=>[a,a.replace(ART,"")]);
+ const all=[answer,...alts];
+ if(all.some(a=>soft(a)===soft(input)))return 1;
+ if(all.some(a=>norm(a)===norm(input)))return .5;return 0}
+let vk="Restaurante",vi=0,vs=0,vAnswered=false;
+const vt=$("#vtabs"),fl=$("#flips");
+vt.innerHTML=Object.entries(GROUPS).map(([g,ks])=>`<div class="tgroup"><span class="tglabel">${g}</span>${ks.map(k=>`<button role="tab">${k}</button>`).join("")}</div>`).join("");
+vt.querySelectorAll("button").forEach(b=>b.onclick=()=>{vk=b.textContent;vi=0;vs=0;drawV();if(!fl.hidden)drawList()});
+function cloze(ex){return ex.replace(/\[(.+?)\]/,"<b>____</b>")}
+function full(ex){return ex.replace(/\[(.+?)\]/,"<b>$1</b>")}
+function target(ex){return ex.match(/\[(.+?)\]/)[1]}
+function drawV(){
+ vt.querySelectorAll("button").forEach(b=>b.setAttribute("aria-selected",b.textContent===vk));
+ const L=VOCAB[vk],[es,en,tr,ex]=L[vi],c=$("#dcard");vAnswered=false;
+ $("#vcount").textContent=`${vi+1} / ${L.length} · ${vk}`;$("#vstage").textContent=`${vs+1}/5 · ${STAGES[vs]}`;
+ $("#vbar").style.width=((vi*5+vs)/(L.length*5)*100)+"%";
+ $("#vnext").textContent=vs===0?"Voltear ↺":vs===1?"Practicar →":"Siguiente →";
+ $("#vnext").disabled=vs>=2;
+ if(vs===0){c.innerHTML=`<div class="stage">Di la palabra en voz alta</div><div class="big">${es}</div>`}
+ else if(vs===1){c.innerHTML=`<div class="stage">Significado</div><div class="big" style="font-size:1.6rem">${es}</div><div class="mean">${en} · <i>${tr}</i></div><div class="exs">${full(ex)}</div>`}
+ else if(vs===2){const others=shuffle(L.filter((_,j)=>j!==vi)).slice(0,2).map(x=>x[1]);const opts=shuffle([en,...others]);
+  c.innerHTML=`<div class="stage">¿Qué significa?</div><div class="big" style="font-size:1.6rem">${es}</div><div class="opts-col">${opts.map(o=>`<button class="opt">${o}</button>`).join("")}</div>`;
+  c.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(vAnswered)return;vAnswered=true;const ok=b.textContent===en;mark(ok,1,"vocab");
+   c.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.textContent===en)x.classList.add("ok")});if(!ok)b.classList.add("bad");$("#vnext").disabled=false})}
+ else{const isCloze=vs===3,ans=isCloze?target(ex):es;
+  c.innerHTML=`<div class="stage">${isCloze?"Completa la frase":"¿Cómo se dice en español?"}</div>
+   <div class="q">${isCloze?cloze(ex)+` <span style="color:var(--muted);font-size:.9rem">(${es})</span>`:`<b>${en}</b> <span style="color:var(--muted)">· ${tr}</span>`}</div>
+   <input id="vin" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your answer"><div class="res" id="vres" style="font-weight:600;min-height:1.5em"></div>`;
+  const inp=$("#vin");inp.focus({preventScroll:true});
+  inp.addEventListener("keydown",e=>{if(e.key!=="Enter")return;if(vAnswered){nextV();return}if(!inp.value.trim())return;vAnswered=true;
+   const g=grade(inp.value,ans);mark(g>0,g,"vocab");$("#vnext").disabled=false;
+   $("#vres").innerHTML=g===1?`<span style="color:var(--ok)">✓ ${ans}</span>`:g?`<span style="color:var(--gold)">½ ${ans} (check the accent)</span>`:`<span style="color:var(--bad)">✗ ${ans}</span>`;
+   if(isCloze)c.querySelector(".q").innerHTML=full(ex)});
+  $("#vnext").disabled=false;$("#vnext").textContent="Comprobar / Siguiente →"}
+}
+function nextV(){const L=VOCAB[vk];
+ if(vs>=3&&!vAnswered){const inp=$("#vin");if(inp&&inp.value.trim()){inp.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter"}));return}}
+ if(vs<4){vs++}else{vs=0;vi=(vi+1)%L.length}drawV()}
+$("#vnext").onclick=nextV;
+$("#vback").onclick=()=>{if(vs>0)vs--;else if(vi>0){vi--;vs=1}drawV()};
+function drawList(){fl.innerHTML=VOCAB[vk].map(([es,en,tr])=>`<button class="flip"><span class="es">${es}</span><span class="en">${en}</span><span class="trk">${tr}</span><span class="hint">toca</span></button>`).join("");
+ fl.querySelectorAll(".flip").forEach(f=>f.onclick=()=>f.classList.toggle("open"))}
+$("#vlist").onclick=()=>{fl.hidden=!fl.hidden;$("#vlist").textContent=fl.hidden?"Ver la lista completa":"Ocultar la lista";if(!fl.hidden)drawList()};
+drawV();
+
+/* ---------- B · markers ---------- */
+const MK=[["ayer","dün","ind"],["esta mañana","bu sabah","per"],["normalmente","genellikle","pre"],["el sábado pasado","geçen cumartesi","ind"],["este año","bu yıl","per"],["todos los días","her gün","pre"],["hace dos meses","iki ay önce","ind"],["nunca","hiç","per"],["anoche","dün gece","ind"],["hoy","bugün","per"],["ahora","şimdi","pre"],["en 2024","2024'te","ind"],["esta semana","bu hafta","per"],["los domingos","pazar günleri","pre"],["la semana pasada","geçen hafta","ind"],["todavía no","henüz değil","per"],["siempre","her zaman","pre"],["el verano pasado","geçen yaz","ind"]];
+const TN={pre:"presente",per:"perfecto",ind:"indefinido"};
+const EXM={pre:"ceno",per:"he cenado",ind:"cené"};
+let mi=0,mlock=false;
+function showMk(){if(mi>=MK.length){$("#mk").innerHTML=`¡Terminado!<small>Pulsa una opción para empezar otra vez</small>`;$("#mkbar").style.width="100%";return}
+ $("#mk").innerHTML=`${MK[mi][0]}<small>${MK[mi][1]}</small>`;$("#mkbar").style.width=(mi/MK.length*100)+"%";$("#mkfb").textContent="";mlock=false}
+document.querySelectorAll(".three-btn .opt").forEach(b=>b.onclick=()=>{
+ if(mi>=MK.length){mi=0;showMk();return}
+ if(mlock)return;mlock=true;const [w,,t]=MK[mi];const ok=b.dataset.t===t;mark(ok);
+ $("#mkfb").innerHTML=ok?`<span style="color:var(--ok)">✓ ${w} → ${TN[t]}: ${w.charAt(0).toUpperCase()+w.slice(1)} <span class="${t}">${EXM[t]}</span>…</span>`:`<span style="color:var(--bad)">✗ ${w} → <span class="${t}">${TN[t]}</span></span>`;
+ setTimeout(()=>{mi++;showMk()},ok?1100:1900)});
+showMk();
+
+/* ---------- C · elige ---------- */
+const C=[
+ ["Esta mañana ___ en una cafetería de Goya.",["he desayunado","desayuné"],0,"esta mañana = still today → perfecto"],
+ ["Ayer ___ al Retiro con Alvi.",["he ido","fui"],1,"ayer = closed → indefinido"],
+ ["Hace tres meses ___ a Madrid.",["he llegado","llegué"],1,"hace + time = closed → indefinido"],
+ ["Esta semana ___ dos exámenes en IE.",["he tenido","tuve"],0,"esta semana is not finished → perfecto"],
+ ["Normalmente ___ en la biblioteca.",["estudio","he estudiado"],0,"normalmente = habit → presente"],
+ ["Nunca ___ cocido madrileño.",["he comido","comí"],0,"nunca = experience → perfecto"],
+ ["El sábado pasado ___ de fiesta por Malasaña.",["hemos salido","salimos"],1,"el sábado pasado = closed → indefinido"],
+ ["Hoy ___ en español con el camarero.",["he hablado","hablé"],0,"hoy = still open → perfecto"],
+ ["Anoche ___ en un restaurante turco.",["he cenado","cené"],1,"anoche = closed → indefinido"],
+ ["Los domingos ___ con mi madre por teléfono.",["hablo","hablé"],0,"los domingos = every Sunday → presente"],
+ ["¿___ alguna vez en Toledo?",["Has estado","Estuviste"],0,"alguna vez = experience → perfecto"],
+ ["En 2025 ___ en Barcelona por primera vez.",["he estado","estuve"],1,"en 2025 = a closed year → indefinido"],
+ ["Todavía no ___ la presentación de marketing.",["he terminado","terminé"],0,"todavía no → perfecto"],
+ ["La semana pasada mi madre ___ a Madrid.",["ha venido","vino"],1,"la semana pasada = closed → indefinido"]
+];
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function renderC(){$("#listC").innerHTML=C.map(([s,o,c,w],k)=>`<div class="item" data-k="${k}"><p class="q">${s.replace("___","<b>____</b>")}</p><div class="row">${o.map((x,i)=>`<button class="opt" data-i="${i}">${x}</button>`).join("")}</div><p class="why" hidden>${w}</p></div>`).join("");
+ document.querySelectorAll("#listC .item").forEach(it=>{const [,o,c]=C[it.dataset.k];
+  it.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const ok=+b.dataset.i===c;mark(ok);
+   it.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(+x.dataset.i===c)x.classList.add("ok")});if(!ok)b.classList.add("bad");
+   it.querySelector(".q b").textContent=o[c];it.querySelector(".why").hidden=false})})}
+renderC();
+
+/* ---------- D · stories: {right|wrong} -- order is shuffled on screen ---------- */
+const STORIES=[
+ ["Mi primera semana en Madrid","Indefinido, the closed past",
+ "Hace tres meses {llegué|he llegado} a Madrid. El primer día {fui|voy} a ver mi piso en Goya: {es|fue} pequeño, pero me {gustó|gustaron} mucho. Esa noche {cené|ceno} sola en un bar de la calle de Goya y {pedí|pido} unas croquetas. El lunes {empecé|empiezo} las clases en IE y {conocí|conozco} a mis compañeros. Después de clase {fuimos|vamos} al Retiro."],
+ ["Hoy en IE","Perfecto, today is still open",
+ "Hoy {me he levantado|me levanté} a las siete. {He desayunado|Desayuno} un café y una tostada y {he ido|fui} a clase en metro. Esta mañana {hemos tenido|tuvimos} una presentación en grupo y {ha ido|fue} muy bien. Pero todavía no {he hecho|hice} los deberes de español… ¡y mañana {tengo|he tenido} clase!"],
+ ["Una cena en Goya","Restaurant + me gustó / me gustaron",
+ "Anoche Alvi y yo {cenamos|hemos cenado} en un restaurante nuevo de mi barrio. De primero yo {pedí|pido} gazpacho y Alvi {pidió|pedí} una ensalada. Las croquetas me {gustaron|gustó} mucho, pero el pescado no me {gustó|gustaron} nada. Al final {pagamos|pagáis} cuarenta euros y {volvimos|volvemos} a casa andando."],
+ ["Un día normal (y uno especial)","Presente vs indefinido",
+ "Normalmente {me levanto|me levanté} a las ocho y {voy|fui} a IE en metro. Por la tarde {hago|hice} yoga y {ceno|cené} en casa. Pero el viernes pasado {fue|es} diferente: no {fui|voy} a clase, {comí|como} en el Mercado de San Miguel con mis amigos y por la noche {salimos|salgo} de copas hasta las tres."],
+ ["Nunca he…","Experiences: perfecto",
+ "{He estado|Estuve} en Barcelona dos veces y en Valencia una vez, pero nunca {he ido|fui} a Marbella. En abril {voy a ir|he ido} con mis amigas. Tampoco {he visto|vi} un partido del Real Madrid. Y tú, ¿{has probado|probaste} alguna vez los churros con chocolate?"]
+];
+function parseStory(t){return t.replace(/\{([^|}]+)\|([^}]+)\}/g,(_,a,b)=>{const o=Math.random()<.5?[a,b]:[b,a];
+ return `<span class="inl" data-r="${a}">${o.map(x=>`<button class="opt">${x}</button>`).join("")}</span>`})}
+function renderStories(){$("#stories").innerHTML=STORIES.map(([h,m,t])=>`<div class="item story"><h3>${h}</h3><p class="meta">${m}</p><p>${parseStory(t)}</p></div>`).join("");
+ document.querySelectorAll(".inl").forEach(g=>g.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const ok=b.textContent===g.dataset.r;mark(ok);
+  if(ok){g.innerHTML=`<b class="opt ok" style="cursor:default">${g.dataset.r}</b>`}else{b.classList.add("bad");b.disabled=true;g.dataset.miss="1";
+   g.querySelectorAll(".opt").forEach(x=>{if(x.textContent===g.dataset.r){x.onclick=()=>{g.innerHTML=`<b class="opt ok" style="cursor:default">${g.dataset.r}</b>`}}})}}))}
+renderStories();
+/* a wrong tap scores 0; the student then taps the right one to fix the text without scoring again */
+
+/* ---------- E · drill ---------- */
+const P=["yo","tú","él / ella","nosotros","vosotros","ellos / ellas"];
+const PRES={hablar:"hablo hablas habla hablamos habláis hablan",comer:"como comes come comemos coméis comen",vivir:"vivo vives vive vivimos vivís viven",
+ estudiar:"estudio estudias estudia estudiamos estudiáis estudian",cenar:"ceno cenas cena cenamos cenáis cenan",beber:"bebo bebes bebe bebemos bebéis beben",
+ ser:"soy eres es somos sois son",estar:"estoy estás está estamos estáis están",tener:"tengo tienes tiene tenemos tenéis tienen",ir:"voy vas va vamos vais van",
+ querer:"quiero quieres quiere queremos queréis quieren",hacer:"hago haces hace hacemos hacéis hacen",salir:"salgo sales sale salimos salís salen",
+ saber:"sé sabes sabe sabemos sabéis saben",conocer:"conozco conoces conoce conocemos conocéis conocen"};
+const PART={hablar:"hablado",comer:"comido",vivir:"vivido",estudiar:"estudiado",cenar:"cenado",beber:"bebido",ser:"sido",estar:"estado",tener:"tenido",ir:"ido",querer:"querido",hacer:"hecho",salir:"salido",saber:"sabido",conocer:"conocido",ver:"visto",escribir:"escrito",volver:"vuelto",decir:"dicho"};
+const HAB=["he","has","ha","hemos","habéis","han"];
+const INDF={hablar:"hablé hablaste habló hablamos hablasteis hablaron",comer:"comí comiste comió comimos comisteis comieron",vivir:"viví viviste vivió vivimos vivisteis vivieron",
+ estudiar:"estudié estudiaste estudió estudiamos estudiasteis estudiaron",cenar:"cené cenaste cenó cenamos cenasteis cenaron",beber:"bebí bebiste bebió bebimos bebisteis bebieron",
+ salir:"salí saliste salió salimos salisteis salieron",ser:"fui fuiste fue fuimos fuisteis fueron",ir:"fui fuiste fue fuimos fuisteis fueron",
+ tener:"tuve tuviste tuvo tuvimos tuvisteis tuvieron",estar:"estuve estuviste estuvo estuvimos estuvisteis estuvieron",hacer:"hice hiciste hizo hicimos hicisteis hicieron"};
+const MODES={"Presente":"pre","Perfecto":"per","Indefinido":"ind","Todo mezclado":"mix"};
+let mode="pre",cur=null,dDone=false,dReady=false;
+function forms(t,v){if(t==="pre")return PRES[v].split(" ");if(t==="ind")return INDF[v].split(" ");return HAB.map(h=>h+" "+PART[v])}
+function pickD(){const t=mode==="mix"?["pre","per","ind"][Math.random()*3|0]:mode;
+ const pool=Object.keys(t==="pre"?PRES:t==="ind"?INDF:PART);const v=pool[Math.random()*pool.length|0];const p=Math.random()*6|0;
+ cur={t,v,p,a:forms(t,v)[p]};dDone=false;
+ $("#dprompt").innerHTML=`<span class="pill ${t}">${TN[t]}</span><br><span style="color:var(--muted)">${P[p]}</span> · <b class="${t}">${v}</b>`;
+ $("#dinput").value="";$("#dres").textContent="";if(dReady)$("#dinput").focus({preventScroll:true})}
+const strip=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim().replace(/\s+/g," ");
+function checkD(){if(dDone){pickD();return}const v=$("#dinput").value.trim().toLowerCase().replace(/\s+/g," ");if(!v)return;dDone=true;
+ if(v===cur.a){mark(true);$("#dres").innerHTML=`<span style="color:var(--ok)">✓ ${cur.a}</span> <span style="color:var(--muted);font-weight:400">— Enter for the next one</span>`}
+ else if(strip(v)===strip(cur.a)){mark(true,.5);$("#dres").innerHTML=`<span style="color:var(--gold)">½ Almost: <b>${cur.a}</b> (check the accent)</span>`}
+ else{mark(false);$("#dres").innerHTML=`<span style="color:var(--bad)">✗ <b>${cur.a}</b></span>`}}
+$("#dtabs").innerHTML=Object.keys(MODES).map(k=>`<button>${k}</button>`).join("");
+[...$("#dtabs").children].forEach(b=>b.onclick=()=>{mode=MODES[b.textContent];[...$("#dtabs").children].forEach(x=>x.setAttribute("aria-selected",x===b));pickD()});
+$("#dtabs").children[0].setAttribute("aria-selected","true");
+$("#dcheck").onclick=checkD;$("#dskip").onclick=pickD;$("#dinput").addEventListener("keydown",e=>{if(e.key==="Enter")checkD()});
+function tbl(t,v){return `<table><tr><th colspan="2" class="${t}">${v} <span class="pill ${t}">${TN[t]}</span></th></tr>${forms(t,v).map((f,i)=>`<tr><td>${P[i]}</td><td style="color:var(--ink)">${f}</td></tr>`).join("")}</table>`}
+$("#dtables").innerHTML=["ser","estar","tener","ir","querer","hacer","salir","saber","conocer"].map(v=>tbl("pre",v)).join("")+["hablar","comer","hacer"].map(v=>tbl("per",v)).join("")+["hablar","comer","ser","tener","estar","hacer"].map(v=>tbl("ind",v)).join("");
+pickD();dReady=true;
+
+/* ---------- F · order ---------- */
+const F=[
+ ["Vivo en un piso en el barrio de Goya.","I live in a flat in the Goya neighbourhood."],
+ ["Normalmente voy a IE en metro.","I usually go to IE by metro."],
+ ["Los españoles cenan muy tarde.","Spaniards have dinner very late."],
+ ["Esta mañana he desayunado en una cafetería.","This morning I had breakfast in a café."],
+ ["Ayer fui de compras a la calle Serrano.","Yesterday I went shopping on Serrano street."],
+ ["No me gusta nada el ajo.","I don't like garlic at all."],
+ ["El sábado pasado salimos de fiesta.","Last Saturday we went partying."],
+ ["Nunca he estado en Marbella.","I have never been to Marbella."]
+];
+function renderF(){$("#listF").innerHTML=F.map(([s,e],k)=>`<div class="item" data-k="${k}"><p class="trans">${e}</p><div class="built"></div><div class="row pool">${shuffle(s.replace(/\.$/,"").split(" ")).map(w=>`<button class="chip">${w}</button>`).join("")}</div><p class="why" hidden></p></div>`).join("");
+ document.querySelectorAll("#listF .item").forEach(it=>{const target=F[it.dataset.k][0].replace(/\.$/,"");const built=it.querySelector(".built"),pool=it.querySelector(".pool");let done=false;
+  it.addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c||done)return;(c.parentElement===pool?built:pool).appendChild(c);
+   if(!pool.children.length){const got=[...built.children].map(x=>x.textContent).join(" ");const ok=got===target;mark(ok);done=true;const w=it.querySelector(".why");w.hidden=false;
+    w.innerHTML=ok?`<span style="color:var(--ok)">✓ ${target}.</span>`:`<span style="color:var(--bad)">✗ ${target}.</span>`}})})}
+renderF();
+
+/* ---------- G · restaurant dialogue ---------- */
+const G=[
+ ["Camarero","Hola, buenas noches. ¿Tenéis reserva?",["Sí, a nombre de Deniz Çolak.","Sí, me llamo la mesa.","Sí, tengo veinte años."],0],
+ ["Camarero","¿Qué vais a tomar de primero?",["Para mí, una ensalada.","A mí, me ensalada.","Yo tomo la cuenta."],0],
+ ["Camarero","¿Y de segundo?",["De segundo, pollo con patatas.","Segundo es pollo.","El pollo está en la mesa."],0],
+ ["Camarero","¿Y para beber?",["Agua con gas, por favor.","Estoy agua.","Bebo ayer agua."],0],
+ ["Camarero","¿Qué tal el pollo?",["¡Está muy rico!","¡Es muy rico ayer!","¡Me gustan el pollo!"],0],
+ ["Camarero","¿Queréis postre o café?",["No, gracias, estoy llena.","No, gracias, soy llena.","No, gracias, tengo llena."],0],
+ ["Deniz","(You want to pay.)",["¿Nos trae la cuenta, por favor?","¿Dónde está la propina?","¿Qué vas a tomar?"],0],
+ ["Alvi","Al día siguiente: «¿Qué tal la cena de anoche?»",["¡Me encantó! Comí un pollo buenísimo.","¡Me encanta! He comido anoche pollo.","¡Me encantaron! Como pollo."],0]
+];
+$("#listG").innerHTML=G.map(([w,q,o,c],k)=>`<div class="item" data-k="${k}"><div class="who">${w}</div><div class="bubble">${q}</div><div class="opts-col">${shuffle(o.map((x,i)=>[x,i])).map(([x,i])=>`<button class="opt" data-i="${i}">${x}</button>`).join("")}</div></div>`).join("");
+document.querySelectorAll("#listG .item").forEach(it=>{const c=G[it.dataset.k][3];it.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const ok=+b.dataset.i===c;mark(ok);
+ it.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(+x.dataset.i===c)x.classList.add("ok")});if(!ok)b.classList.add("bad")})});
+
+/* ---------- H · gusta ---------- */
+const H=[["Me ___ las croquetas.",["gusta","gustan"],1],["Me ___ cenar tarde.",["gusta","gustan"],0],["No me ___ el ajo.",["gusta","gustan"],0],["Me ___ los bares de Goya.",["gusta","gustan"],1],
+ ["Ayer la película no me ___.",["gustó","gustaron"],0],["Las tapas de anoche me ___ mucho.",["gustó","gustaron"],1],["¿Te ___ Barcelona?",["gustó","gustaron"],0],["Me ___ los churros de San Ginés.",["encantó","encantaron"],1]];
+$("#listH").innerHTML=H.map(([s,o],k)=>`<div class="item" data-k="${k}"><p class="q">${s.replace("___","<b>____</b>")}</p><div class="row">${o.map((x,i)=>`<button class="opt" data-i="${i}">${x}</button>`).join("")}</div></div>`).join("");
+document.querySelectorAll("#listH .item").forEach(it=>{const [,o,c]=H[it.dataset.k];it.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const ok=+b.dataset.i===c;mark(ok);
+ it.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(+x.dataset.i===c)x.classList.add("ok")});if(!ok)b.classList.add("bad");it.querySelector(".q b").textContent=o[c]})});
+
+/* ---------- I · sentence builder ---------- */
+const TL={pre:"presente",per:"perfecto",ind:"indefinido",fut:"ir a + infinitivo"};
+const I=[
+ [["yo","vivir","un piso","Goya"],"pre","Vivo en un piso en Goya."],
+ [["mis compañeros","ser","muchos países"],"pre","Mis compañeros son de muchos países."],
+ [["los españoles","cenar","muy tarde"],"pre","Los españoles cenan muy tarde."],
+ [["a mí","no","gustar","el ajo"],"pre","No me gusta el ajo."],
+ [["esta mañana","yo","desayunar","una cafetería"],"per","Esta mañana he desayunado en una cafetería."],
+ [["hoy","nosotros","tener","un examen","IE"],"per","Hoy hemos tenido un examen en IE."],
+ [["yo","nunca","estar","Marbella"],"per","Nunca he estado en Marbella."],
+ [["ayer","yo","ir","el Retiro","Alvi"],"ind","Ayer fui al Retiro con Alvi."],
+ [["anoche","nosotros","cenar","un restaurante turco"],"ind","Anoche cenamos en un restaurante turco."],
+ [["hace tres meses","yo","llegar","Madrid"],"ind","Hace tres meses llegué a Madrid."],
+ [["a mí","encantar","las croquetas","anoche"],"ind","Anoche me encantaron las croquetas."],
+ [["en abril","yo","ir a","viajar","Marbella"],"fut","En abril voy a viajar a Marbella."]
+];
+$("#listI").innerHTML=I.map(([ch,t,m],k)=>`<div class="item" data-k="${k}"><div class="row" style="justify-content:space-between"><span class="pill ${t==="fut"?"":t}" style="${t==="fut"?"background:var(--gold-soft);color:var(--gold)":""}">${TL[t]}</span><span class="wc">${k+1} / ${I.length}</span></div>
+ <div class="chips">${ch.map(c=>`<span>${c}</span>`).join("")}</div><textarea placeholder="Escribe tu frase aquí…" aria-label="Your sentence"></textarea>
+ <div class="row" style="margin-top:8px"><button class="opt show">Ver el modelo</button></div><div class="out"></div></div>`).join("");
+document.querySelectorAll("#listI .item").forEach(it=>{const m=I[it.dataset.k][2];let scored=false;
+ it.querySelector(".show").onclick=()=>{const v=it.querySelector("textarea").value.trim();if(scored)return;
+  const out=it.querySelector(".out");
+  if(v&&norm(v)===norm(m)){scored=true;mark(true,1,"frases");out.innerHTML=`<div class="model">✓ <b>¡Perfecto!</b> ${m}</div>`;return}
+  out.innerHTML=`<div class="model">Modelo: <b>${m}</b><br><span class="wc">Other correct versions are possible. Was yours right?</span>
+   <div class="row" style="margin-top:8px"><button class="opt y">✓ Sí, estaba bien</button><button class="opt n">✗ Tenía errores</button></div></div>`;
+  out.querySelector(".y").onclick=()=>{if(scored)return;scored=true;mark(true,1,"frases");out.querySelector(".row").innerHTML=`<span style="color:var(--ok);font-weight:600">✓ ¡Bien!</span>`};
+  out.querySelector(".n").onclick=()=>{if(scored)return;scored=true;mark(false,1,"frases");out.querySelector(".row").innerHTML=`<span style="color:var(--muted);font-weight:600">Copy the model once in your notebook.</span>`}}});
+
+/* ---------- J · free writing (saved on this device) ---------- */
+const J=[
+ ["Un día normal en Madrid","pre","Write 5–6 sentences in the present: where you live, how you go to IE, what you do in the afternoon and at night.",
+  "Vivo en Goya, en un piso pequeño pero bonito. Normalmente voy a IE en metro. Por la tarde estudio en la biblioteca o hago yoga. Los viernes quedo con mis amigos y cenamos en un restaurante de mi barrio. Me gusta mucho Madrid porque hay mucha vida."],
+ ["Mi fin de semana pasado","ind","Write 5–6 sentences in the indefinido: what you did on Saturday and Sunday, where you ate, what you liked or didn't like.",
+  "El sábado me levanté tarde y desayuné en una cafetería. Después fui de compras a la calle de Goya. Por la noche cené con Alvi en un restaurante español: las croquetas me encantaron, pero el vino no me gustó. El domingo paseé por el Retiro y por la tarde estudié."],
+ ["Esta semana y en mi vida","per","Write 4–5 sentences in the perfecto: what you have done this week, and experiences (nunca, dos veces, todavía no).",
+  "Esta semana he tenido dos exámenes y he hecho una presentación. He estado en Barcelona dos veces y en Valencia una vez. Nunca he ido a Marbella, pero en abril voy a ir. Todavía no he visto un partido del Real Madrid."]
+];
+function load(k){try{return localStorage.getItem("deniz-j"+k)||""}catch(e){return ""}}
+function save(k,v){try{localStorage.setItem("deniz-j"+k,v)}catch(e){}}
+$("#listJ").innerHTML=J.map(([h,t,ins],k)=>`<div class="item" data-k="${k}"><div class="row" style="justify-content:space-between"><h3>${h}</h3><span class="pill ${t}">${TL[t]}</span></div>
+ <p class="trans" style="margin-top:6px">${ins}</p><textarea style="min-height:140px" placeholder="Escribe aquí…"></textarea>
+ <div class="row" style="justify-content:space-between;margin-top:8px"><span class="wc">0 palabras</span><button class="opt show">He terminado · ver modelo</button></div><div class="out"></div></div>`).join("");
+document.querySelectorAll("#listJ .item").forEach(it=>{const k=it.dataset.k,ta=it.querySelector("textarea"),wc=it.querySelector(".wc");let scored=false;
+ const count=()=>{const n=ta.value.trim()?ta.value.trim().split(/\s+/).length:0;wc.textContent=`${n} palabra${n===1?"":"s"}`;return n};
+ ta.value=load(k);count();ta.addEventListener("input",()=>{save(k,ta.value);count()});
+ it.querySelector(".show").onclick=()=>{const n=count();if(n<15){wc.textContent=`${n} palabras · write at least 15 first`;return}
+  if(!scored){scored=true;mark(true,1,"escribe")}
+  it.querySelector(".out").innerHTML=`<div class="model">Modelo: ${J[k][3]}</div>`}});
+
+$("#reset").onclick=()=>location.reload();
+</script>
+</body></html>
