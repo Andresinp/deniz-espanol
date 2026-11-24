@@ -18,6 +18,7 @@
   --b5:#9a3a78; --b5-s:#f7dcef;
   --b6:#0f6e7a; --b6-s:#d4eef0;
   --imp:#1f6fb2; --imp-s:#e1eefa;
+  --fut:#3949ab; --fut-s:#e3e6f8;
   --gr:#835c00; --gr-s:#fbf0cb;
   --cn:#a0501a; --cn-s:#fde3cf;
   --display:"Fraunces",Georgia,serif;
@@ -135,7 +136,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .boot .chip i{font-size:15px}
 
 /* time markers */
-.tm{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tm{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .tm > div{border-radius:14px;padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--surface)}
 .tm .h{font:700 22px/1.1 var(--display)}
 .tm .chip{font-size:18px;padding:3px 12px}
@@ -296,6 +297,37 @@ ul,ol{margin:0;padding:0;list-style:none}
   box-shadow:0 12px 40px -16px rgba(0,0,0,.5);max-width:calc(100vw - 32px)}
 .two p span{font-size:1.8rem}
 @media (prefers-reduced-motion: reduce){.toast,.two{transition:none}}
+/* ---------- futuro + block 7 ---------- */
+.tfu{color:var(--fut);font-weight:700}
+.cj.fut .e{color:var(--fut)}
+.k7 .sec .kick,.k7 h2{color:var(--fut)} .k7{border-top:8px solid var(--fut)} .k7 .ls .ph{color:var(--fut)}
+.w7 .n{background:var(--fut)} .w7 h3{color:var(--fut)} .w7{background:color-mix(in srgb,var(--fut-s) 55%,var(--surface))}
+.nav .go button[data-k="b7"]{background:var(--fut-s)}
+.fu-f{font:600 24px/1.3 var(--display);background:var(--fut-s);border-radius:14px;padding:10px 16px}
+.fu-f .e{color:var(--fut)}
+
+/* ---------- dictionary in the top bar ---------- */
+.dict{position:relative;flex:0 1 330px;min-width:0}
+.dict input{width:100%;font:inherit;font-size:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:9px 16px 9px 40px;min-height:40px;outline:none;-webkit-appearance:none;appearance:none}
+.dict input:focus{border-color:var(--fut)}
+.dict .dico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;color:var(--muted)}
+.dres{position:absolute;right:0;top:calc(100% + 8px);width:min(400px,calc(100vw - 32px));background:var(--surface);
+  border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(29,36,51,.18);overflow:hidden;z-index:30}
+.dres .dh{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:13px;color:var(--muted);
+  letter-spacing:.06em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--line)}
+.dres .dl{max-height:min(50vh,420px);overflow-y:auto}
+.dres button.dr{display:flex;width:100%;gap:10px;align-items:baseline;text-align:left;border:0;background:none;font:inherit;
+  padding:10px 14px;cursor:pointer;color:var(--ink);border-bottom:1px solid #f1ede5}
+.dres button.dr:hover,.dres button.dr:focus-visible{background:var(--paper);outline:none}
+.dres .es{font-weight:700;font-size:18px}
+.dres .es small{font-weight:400;color:var(--muted);font-size:15px;margin-right:4px}
+.dres .en{color:var(--muted);font-size:15px;margin-left:auto;text-align:right}
+.dres .none{padding:12px 14px;color:var(--muted);font-size:15px}
+.dres a.wr{display:block;padding:11px 14px;background:var(--paper);color:var(--fut);font-weight:700;font-size:15px;text-decoration:none}
+@media (max-width:520px){.top .ttl{display:none}.dict{flex:1}}
+@media (max-width:760px){.dres{position:fixed;left:16px;right:16px;width:auto;top:calc(env(safe-area-inset-top,0px) + 64px)}}
+
 </style>
 </head>
 <body>
@@ -303,6 +335,8 @@ ul,ol{margin:0;padding:0;list-style:none}
 <div class="top">
   <a class="who" href="../">← Deniz · Español</a>
   <span class="ttl">Mi semana en Madrid · mapa de escritura</span>
+  <div class="dict" id="dict"><span class="dico">📖</span><input id="dq" type="search" placeholder="Diccionario · English ⇄ español" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Diccionario inglés español">
+    <div class="dres" id="dres" hidden><div class="dh"><span id="dhl">Toca una palabra: va a tu texto</span></div><div class="dl" id="dl"></div><a class="wr" id="dwr" target="_blank" rel="noopener">WordReference ↗</a></div></div>
   <button class="btn main" data-go="k-write" type="button">✍︎ Mis textos</button>
 </div>
 
@@ -526,7 +560,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   <div class="col" id="c-mid">
     <div class="card" id="k-write">
       <h2>Mis textos</h2>
-      <p>Seis textos pequeños. Toca un bloque y después una frase del mapa: aparece en ese bloque.</p>
+      <p>Siete textos pequeños. Toca un bloque y después una frase del mapa: aparece en ese bloque.</p>
 
       <div class="wblk w1 on" data-b="1">
         <div class="wblk-h"><h3><span class="n">1</span>Mi semana <small>6–8 frases · presente y pasado</small></h3>
@@ -570,6 +604,13 @@ ul,ol{margin:0;padding:0;list-style:none}
         <span class="bc"></span>
       </div>
 
+      <div class="wblk w7" data-b="7">
+        <div class="wblk-h"><h3><span class="n">7</span>Mi futuro <small>4–5 frases · futuro simple</small></h3>
+          <div class="qs"><span>¿Dónde vivirás en 2030?</span><span>¿Qué harás después de IE?</span><span>¿Qué idiomas hablarás?</span></div></div>
+        <textarea class="wt" id="d7" lang="es" spellcheck="false" placeholder="El año que viene…"></textarea>
+        <span class="bc"></span>
+      </div>
+
       <div class="wbar"><span class="wc" id="wc">0 palabras</span><span class="target">frases cortas: <b>sujeto + verbo + algo</b></span><span style="flex:1"></span>
         <button class="btn" id="undoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="copyBtn" type="button">Copiar</button></div>
     </div>
@@ -585,6 +626,8 @@ ul,ol{margin:0;padding:0;list-style:none}
           <div class="chips"><span class="chip ph" data-ins="Ayer ">ayer</span><span class="chip ph" data-ins="anoche ">anoche</span><span class="chip ph" data-ins="el lunes ">el lunes</span><span class="chip ph" data-ins="la semana pasada ">la semana pasada</span><span class="chip ph" data-ins="el sábado ">el sábado</span></div></div>
         <div><span class="h tm2">Imperfecto</span>
           <div class="chips"><span class="chip ph" data-ins="Antes ">antes</span><span class="chip ph" data-ins="Cuando era pequeña, ">cuando era pequeña</span><span class="chip ph" data-ins="todos los veranos ">todos los veranos</span><span class="chip ph" data-ins="siempre ">siempre (antes)</span></div></div>
+        <div><span class="h tfu">Futuro</span>
+          <div class="chips"><span class="chip ph" data-ins="Mañana ">mañana</span><span class="chip ph" data-ins="El año que viene ">el año que viene</span><span class="chip ph" data-ins="dentro de cinco años ">dentro de 5 años</span><span class="chip ph" data-ins="en 2030 ">en 2030</span><span class="chip ph" data-ins="algún día ">algún día</span></div></div>
       </div>
     </div>
 
@@ -691,11 +734,64 @@ ul,ol{margin:0;padding:0;list-style:none}
       </div>
     </div>
 
+    <div class="card gr" id="k-fut">
+      <h3><span class="tfu">Futuro simple</span> <small>mañana · el año que viene</small></h3>
+      <p class="fu-f">infinitivo + <span class="e">é · ás · á · emos · éis · án</span></p>
+      <table class="cj fut">
+        <thead><tr><th></th><th class="big">viajar</th><th class="big">vivir</th></tr></thead>
+        <tbody>
+          <tr><th>yo</th><td>viajar<span class="e">é</span></td><td>vivir<span class="e">é</span></td></tr>
+          <tr><th>tú</th><td>viajar<span class="e">ás</span></td><td>vivir<span class="e">ás</span></td></tr>
+          <tr><th>él, ella</th><td>viajar<span class="e">á</span></td><td>vivir<span class="e">á</span></td></tr>
+          <tr><th>nosotros</th><td>viajar<span class="e">emos</span></td><td>vivir<span class="e">emos</span></td></tr>
+          <tr><th>vosotros</th><td>viajar<span class="e">éis</span></td><td>vivir<span class="e">éis</span></td></tr>
+          <tr><th>ellos, ellas</th><td>viajar<span class="e">án</span></td><td>vivir<span class="e">án</span></td></tr>
+        </tbody>
+      </table>
+      <span class="lab">irregulares · misma terminación</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="tendré "><b>tendré</b><i>tener</i></span>
+        <span class="chip ph" data-ins="haré "><b>haré</b><i>hacer</i></span>
+        <span class="chip ph" data-ins="podré "><b>podré</b><i>poder</i></span>
+        <span class="chip ph" data-ins="saldré "><b>saldré</b><i>salir</i></span>
+        <span class="chip ph" data-ins="vendré "><b>vendré</b><i>venir</i></span>
+        <span class="chip ph" data-ins="querré "><b>querré</b><i>querer</i></span>
+        <span class="chip ph" data-ins="sabré "><b>sabré</b><i>saber</i></span>
+        <span class="chip ph" data-ins="pondré "><b>pondré</b><i>poner</i></span>
+        <span class="chip ph" data-ins="diré "><b>diré</b><i>decir</i></span>
+        <span class="chip ph" data-ins="habrá "><b>habrá</b><i>hay</i></span>
+      </div>
+      <p class="warn">⚠︎ Tilde: viajar<b class="tfu">é</b>, comer<b class="tfu">á</b>… pero viajar<b class="tfu">emos</b> sin tilde</p>
+    </div>
+
+    <div class="card k7" id="k-manana">
+      <div class="sec"><span class="kick">Bloque 7 · futuro simple</span><h2>Mi futuro</h2></div>
+      <ul class="ls">
+        <li class="ph" data-ins="El año que viene ">El año que viene…</li>
+        <li class="ph" data-ins="Dentro de cinco años, viviré en ">Dentro de cinco años, viviré en…</li>
+        <li class="ph" data-ins="Después de IE, trabajaré en ">Después de IE, trabajaré en…</li>
+        <li class="ph" data-ins="Algún día tendré ">Algún día tendré…</li>
+        <li class="ph" data-ins="En 2030, mi vida será ">En 2030, mi vida será…</li>
+        <li class="ph" data-ins="Creo que en Madrid habrá ">Creo que en Madrid habrá…</li>
+        <li class="ph" data-ins="Mis padres vendrán a Madrid en ">Mis padres vendrán a Madrid en…</li>
+        <li class="ph" data-ins="Probablemente ">Probablemente…</li>
+      </ul>
+      <span class="lab">ideas</span>
+      <div class="chips">
+        <span class="chip ph" data-ins="hablaré español muy bien ">hablaré español muy bien</span>
+        <span class="chip ph" data-ins="viajaré a ">viajaré a…</span>
+        <span class="chip ph" data-ins="seré ">seré…</span>
+        <span class="chip ph" data-ins="ganaré mucho dinero ">ganaré mucho dinero</span>
+        <span class="chip ph" data-ins="tendré un perro ">tendré un perro</span>
+        <span class="chip ph" data-ins="volveré a Estambul ">volveré a Estambul</span>
+      </div>
+    </div>
+
     <div class="card" id="k-check">
       <h3>Antes de terminar</h3>
       <ul class="checks">
         <li><span class="tp">normalmente</span> → presente · <span class="tf">hoy, esta semana</span> → perfecto · <span class="ti">ayer, el lunes</span> → indefinido</li>
-        <li><span class="tm2">antes, cuando era pequeña</span> → imperfecto</li>
+        <li><span class="tm2">antes, cuando era pequeña</span> → imperfecto · <span class="tfu">mañana, en 2030</span> → futuro</li>
         <li>La vocal: qu<span class="v">ie</span>ro, p<span class="v">ue</span>do, p<span class="v">i</span>do, j<span class="v">ue</span>go</li>
         <li><b>hay</b> un parque · el Retiro <b>está</b>…</li>
         <li>me <b>gusta</b> + una cosa · me <b>gustan</b> + cosas</li>
@@ -789,12 +885,14 @@ ul,ol{margin:0;padding:0;list-style:none}
     <button type="button" data-go="k-perf" data-k="gr">Perfecto</button>
     <button type="button" data-go="k-indef" data-k="gr">Indefinido</button>
     <button type="button" data-go="k-imp" data-k="gr">Imperfecto</button>
+    <button type="button" data-go="k-fut" data-k="gr">Futuro</button>
     <button type="button" data-go="k-sem" data-k="b1">1 · Mi semana</button>
     <button type="button" data-go="k-exp" data-k="b2">2 · ¿Alguna vez?</button>
     <button type="button" data-go="k-hay" data-k="b3">3 · Hay</button>
     <button type="button" data-go="k-sup" data-k="b4">4 · Lo más</button>
     <button type="button" data-go="gusta" data-k="b5">5 · Me gusta</button>
     <button type="button" data-go="k-antes" data-k="b6">6 · Antes y ahora</button>
+    <button type="button" data-go="k-manana" data-k="b7">7 · Mi futuro</button>
     <button type="button" data-go="k-cn" data-k="cn">Conectores</button>
     <button type="button" data-go="k-google" data-k="b4">Ask Google</button>
   </div>
@@ -975,6 +1073,54 @@ function search(b){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
   gT=setInterval(()=>{ i++; gq.textContent=q.slice(0,i); if(i>=q.length){ clearInterval(gT); setTimeout(done,350); } },35);
 }
+
+/* ---- mini dictionary EN ⇄ ES (A1 words for these texts; anything else → WordReference) ---- */
+const DICT=`el día|day;la semana|week;el fin de semana|weekend;el mes|month;el año|year;hoy|today;ayer|yesterday;mañana|tomorrow;la mañana|morning;la tarde|afternoon, evening;la noche|night;anoche|last night;ahora|now;antes|before;después|after, later;luego|then;siempre|always;nunca|never;a veces|sometimes;normalmente|usually;todos los días|every day;temprano|early;tarde|late;pronto|soon;todavía|still, yet;ya|already;
+el lunes|Monday;el martes|Tuesday;el miércoles|Wednesday;el jueves|Thursday;el viernes|Friday;el sábado|Saturday;el domingo|Sunday;el verano|summer;el invierno|winter;la primavera|spring;el otoño|autumn, fall;
+la casa|house, home;el piso|flat, apartment;la habitación|room, bedroom;la cocina|kitchen;el baño|bathroom;la ciudad|city;el barrio|neighbourhood;la calle|street;la plaza|square;el parque|park;el río|river;el mar|sea;la playa|beach;el puente|bridge;la torre|tower;el museo|museum;la iglesia|church;la mezquita|mosque;el mercado|market;la tienda|shop;el supermercado|supermarket;el centro comercial|shopping mall;la farmacia|pharmacy;el hospital|hospital;el banco|bank;el restaurante|restaurant;el bar|bar;la cafetería|café;el gimnasio|gym;la universidad|university;la clase|class;el trabajo|work, job;la oficina|office;la estación|station;el aeropuerto|airport;el metro|metro, subway;el autobús|bus;el tren|train;el avión|plane;el coche|car;el taxi|taxi;el barco|boat, ferry;la bici|bike;
+el desayuno|breakfast;la comida|lunch, food;la cena|dinner;el café|coffee;el té|tea;el agua|water;la leche|milk;el zumo|juice;la cerveza|beer;el vino|wine;el pan|bread;el queso|cheese;el huevo|egg;la carne|meat;el pollo|chicken;el pescado|fish (food);la fruta|fruit;la manzana|apple;la naranja|orange;el plátano|banana;la verdura|vegetables;la ensalada|salad;el arroz|rice;la pasta|pasta;la sopa|soup;el bocadillo|sandwich (baguette);la tortilla|Spanish omelette;el jamón|ham;el chocolate|chocolate;el helado|ice cream;la tarta|cake;el azúcar|sugar;la sal|salt;
+la familia|family;el padre|father;la madre|mother;los padres|parents;el hermano|brother;la hermana|sister;el hijo|son;la hija|daughter;el abuelo|grandfather;la abuela|grandmother;el tío|uncle;la tía|aunt;el primo|cousin (m);la prima|cousin (f);el amigo|friend (m);la amiga|friend (f);el novio|boyfriend;la novia|girlfriend;el compañero de piso|flatmate;el profesor|teacher (m);la profesora|teacher (f);el perro|dog;el gato|cat;
+el amor|love;la cita|date (romantic);el beso|kiss;la fiesta|party;el concierto|concert;la música|music;la canción|song;la película|film, movie;el cine|cinema;el libro|book;el arte|art;el cuadro|painting;el deporte|sport;el fútbol|football;el partido|match, game;el viaje|trip;las vacaciones|holidays;el dinero|money;el móvil|mobile phone;el ordenador|computer;la foto|photo;el regalo|present, gift;la ropa|clothes;los zapatos|shoes;
+el tiempo|weather, time;el sol|sun;la lluvia|rain;la nieve|snow;hace calor|it's hot;hace frío|it's cold;hace sol|it's sunny;llueve|it rains;
+grande|big;pequeño|small;bonito|pretty, nice;feo|ugly;nuevo|new;viejo|old (thing, person);antiguo|old, ancient;moderno|modern;alto|tall, high;bajo|short, low;caro|expensive;barato|cheap;bueno|good;malo|bad;mejor|better, best;peor|worse, worst;mayor|older;menor|younger;rico|tasty, rich;delicioso|delicious;famoso|famous;tranquilo|quiet, calm;ruidoso|noisy;limpio|clean;sucio|dirty;interesante|interesting;aburrido|boring, bored;divertido|fun;simpático|nice, friendly;guapo|good-looking;cansado|tired;contento|happy, glad;feliz|happy;triste|sad;enamorado|in love;nervioso|nervous;ocupado|busy;rápido|fast;lento|slow;fácil|easy;difícil|difficult;importante|important;caliente|hot (thing);frío|cold;lleno|full;vacío|empty;cerca|near, close;lejos|far;
+muy|very;más|more;menos|less;mucho|a lot, much;poco|a little;bastante|quite;demasiado|too much;también|also, too;tampoco|neither;y|and;pero|but;o|or;porque|because;por eso|so, that's why;cuando|when;si|if;con|with;sin|without;para|for, in order to;
+ser|to be (who, what);estar|to be (where, how);tener|to have;haber (hay)|there is, there are;hacer|to do, to make;ir|to go;venir|to come;volver|to come back;salir|to go out, to leave;llegar|to arrive;entrar|to go in;quedarse|to stay;vivir|to live;trabajar|to work;estudiar|to study;aprender|to learn;hablar|to speak, to talk;decir|to say, to tell;preguntar|to ask;contestar|to answer;escribir|to write;leer|to read;escuchar|to listen;ver|to see, to watch;mirar|to look at;comer|to eat;beber|to drink;desayunar|to have breakfast;cenar|to have dinner;cocinar|to cook;comprar|to buy;pagar|to pay;costar|to cost;querer|to want, to love;poder|can, to be able;saber|to know (facts);conocer|to know (people, places), to meet;gustar|to like;encantar|to love (things);odiar|to hate;preferir|to prefer;pensar|to think;creer|to believe;necesitar|to need;buscar|to look for;encontrar|to find;empezar|to start;terminar|to finish;abrir|to open;cerrar|to close;jugar|to play (a game);tocar|to play (an instrument), to touch;bailar|to dance;cantar|to sing;nadar|to swim;correr|to run;andar|to walk;pasear|to go for a walk;viajar|to travel;visitar|to visit;dormir|to sleep;despertarse|to wake up;levantarse|to get up;ducharse|to shower;vestirse|to get dressed;acostarse|to go to bed;descansar|to rest;llamar|to call;enamorarse|to fall in love;ganar|to win, to earn;perder|to lose;dar|to give;poner|to put;llevar|to wear, to carry;tomar|to take, to have (drink);usar|to use;ayudar|to help;esperar|to wait, to hope;olvidar|to forget;recordar|to remember;cambiar|to change;mudarse|to move (house);`
+  .split(';').map(s=>s.trim()).filter(Boolean).map(s=>{ const [es,en]=s.split('|'); return {es,en}; });
+const fold=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const ART=/^(el|la|los|las) /;
+DICT.forEach(d=>{ d.fe=fold(d.es.replace(ART,'')); d.fn=fold(d.en).split(/,\s*/).map(x=>x.replace(/^to /,'').replace(/\s*\(.*\)$/,'')); });
+const dq=document.getElementById('dq'), dres=document.getElementById('dres'), dl=document.getElementById('dl'), dwr=document.getElementById('dwr');
+function dscore(d,q){
+  let best=9;
+  const try1=(w,b)=>{ if(w===q) best=Math.min(best,b); else if(w.startsWith(q)) best=Math.min(best,b+1); else if(w.split(/\s+/).some(x=>x.startsWith(q))) best=Math.min(best,b+2); };
+  try1(d.fe,0); d.fn.forEach(w=>try1(w,0));
+  return best;
+}
+function dsearch(){
+  const raw=dq.value.trim(), q=fold(raw).replace(/^to /,'');
+  if(!q){ dres.hidden=true; return; }
+  const hits=DICT.map(d=>[dscore(d,q),d]).filter(r=>r[0]<9).sort((a,b)=>a[0]-b[0]||a[1].es.length-b[1].es.length).slice(0,8);
+  dl.innerHTML='';
+  if(!hits.length){ const n=document.createElement('div'); n.className='none'; n.textContent='No está en la lista. Búscala en WordReference ↓'; dl.appendChild(n); }
+  hits.forEach(([,d])=>{
+    const b=document.createElement('button'); b.type='button'; b.className='dr';
+    const m=d.es.match(ART), es=document.createElement('span'); es.className='es';
+    if(m){ const sm=document.createElement('small'); sm.textContent=m[1]; es.appendChild(sm); }
+    es.appendChild(document.createTextNode(d.es.replace(ART,'')));
+    const en=document.createElement('span'); en.className='en'; en.textContent=d.en;
+    b.append(es,en);
+    b.onclick=()=>{ insert(d.es.replace(/ \(.*\)$/,'')+' '); dres.hidden=true; dq.blur(); };
+    dl.appendChild(b);
+  });
+  const esFirst=hits.length && hits[0][1].fe.startsWith(q) && !hits[0][1].fn.some(w=>w.startsWith(q));
+  dwr.href='https://www.wordreference.com/'+(esFirst?'esen/':'enes/')+encodeURIComponent(raw);
+  dwr.textContent='«'+raw+'» en WordReference ↗';
+  dres.hidden=false;
+}
+dq.addEventListener('input',dsearch);
+dq.addEventListener('focus',()=>{ if(dq.value.trim()) dsearch(); });
+dq.addEventListener('keydown',e=>{ if(e.key==='Escape'){ dres.hidden=true; dq.blur(); } if(e.key==='Enter'){ const f=dl.querySelector('.dr'); if(f) f.click(); } });
+document.addEventListener('pointerdown',e=>{ if(!e.target.closest('#dict')) dres.hidden=true; });
 
 /* ---- taps ---- */
 view.addEventListener('click',e=>{
